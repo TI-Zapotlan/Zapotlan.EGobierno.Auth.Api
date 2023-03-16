@@ -31,9 +31,10 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             return items;
         }
 
-        public async Task<Usuario> Get(Guid id)
+        public async Task<Usuario?> Get(Guid id)
         {
             var item = await _context.Usuarios.FirstOrDefaultAsync(i => i.ID == id);
+
             return item;
         }
 
@@ -41,6 +42,43 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         {
             _context.Usuarios.Add(item);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> Update(Usuario item)
+        {
+            var currentItem = await Get(item.ID); // Obteniendolo de la base de datos para hacer las actualizaciones al registro
+            if (currentItem != null)
+            {
+                currentItem.PersonaID = item.PersonaID;
+                currentItem.AreaID = item.AreaID;
+                currentItem.EmpleadoID = item.EmpleadoID;
+                currentItem.UsuarioJefeID = item.UsuarioJefeID;
+                currentItem.Username = item.Username;
+                currentItem.Password = item.Password;
+                currentItem.Correo = item.Correo;
+                currentItem.Puesto = item.Puesto;
+                currentItem.Estatus = item.Estatus;
+                currentItem.Rol = item.Rol;
+                currentItem.FechaActualizacion = item.FechaActualizacion;
+            }
+            else return false;
+
+            int rowsAffected = await _context.SaveChangesAsync();
+
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> Delete(Guid id)
+        {
+            var currentItem = await Get(id);
+            if (currentItem != null)
+            {
+                _context.Usuarios.Remove(currentItem);
+                int rowsAffected = await _context.SaveChangesAsync();
+                return rowsAffected > 0;
+            }
+
+            return false;
         }
     }
 }

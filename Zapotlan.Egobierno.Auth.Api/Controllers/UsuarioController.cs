@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Zapotlan.EGobierno.Auth.Api.Responses;
 using Zapotlan.EGobierno.Auth.Core.DTOs;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
@@ -11,19 +12,19 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
     [ApiController]
     public class UsuarioController : ControllerBase
     {
-        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IUsuarioService _usuarioServices;
         private readonly IMapper _mapper;
 
-        public UsuarioController(IUsuarioRepository usuarioRepository, IMapper mapper)
+        public UsuarioController(IUsuarioService usuarioService, IMapper mapper)
         {
-            _usuarioRepository = usuarioRepository;
+            _usuarioServices = usuarioService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> Gets()
         { 
-            var items = await _usuarioRepository.Gets();
+            var items = await _usuarioServices.Gets();
             //var itemsDto = items.Select(i => new UsuarioDetailDto
             //{ 
             //    ID = i.ID,
@@ -44,17 +45,19 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             //    FechaActualizacion = i.FechaActualizacion,
             //});
             var itemsDto = _mapper.Map<IEnumerable<UsuarioDto>>(items);
+            var response = new ApiResponse<IEnumerable<UsuarioDto>>(itemsDto);
 
-            return Ok(itemsDto);
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var item = await _usuarioRepository.Get(id);
+            var item = await _usuarioServices.Get(id);
             var itemDto = _mapper.Map<UsuarioDto>(item);
+            var response = new ApiResponse<UsuarioDto>(itemDto);
 
-            return Ok(itemDto);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -64,10 +67,34 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             item.ID = Guid.NewGuid();
             item.FechaActualizacion = DateTime.Now;
 
-            await _usuarioRepository.Insert(item);
-            return Ok(item);
+            await _usuarioServices.Insert(item);
+
+            itemDto = _mapper.Map<UsuarioDto>(item);
+            var response = new ApiResponse<UsuarioDto>(itemDto);
+
+            return Ok(response);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, UsuarioUpdateDto itemDto)
+        {
+            var item = _mapper.Map<Usuario>(itemDto);
+            item.ID = id;
+            item.FechaActualizacion = DateTime.Now;
 
+            var result = await _usuarioServices.Update(item);
+            var response = new ApiResponse<bool>(result);
+
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _usuarioServices.Delete(id);
+            var response = new ApiResponse<bool>(result);
+
+            return Ok(response);
+        }
     }
 }

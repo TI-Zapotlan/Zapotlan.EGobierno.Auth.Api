@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
+using Zapotlan.EGobierno.Auth.Core.Services;
 using Zapotlan.EGobierno.Auth.Infrastructure.Data;
 using Zapotlan.EGobierno.Auth.Infrastructure.Repositories;
 
@@ -21,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataCenterContext>(options => 
     options.UseSqlServer(dataCenterConnection));
 
+builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 
 //builder.Services.AddMvcCore(options => { // Sin uso porque se utiliza el de ApiController
