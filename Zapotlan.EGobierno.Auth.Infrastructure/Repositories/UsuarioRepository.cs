@@ -10,43 +10,38 @@ using Zapotlan.EGobierno.Auth.Infrastructure.Data;
 
 namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
 {
-    public class UsuarioRepository : IUsuarioRepository
+    public class UsuarioRepository : BaseRepository<Usuario>, IUsuarioRepository
     {
-        private readonly DataCenterContext _context;
+        // CONSTRUCTOR
+        public UsuarioRepository(DataCenterContext context) : base(context)
+        { }
 
-        public UsuarioRepository(DataCenterContext context)
-        {
-            _context = context;
-        }
+        // METHODS 
 
-        public async Task<IEnumerable<Usuario>> Gets()
+        public override IEnumerable<Usuario> Gets()
         {
-            var items = await _context
-                .Usuarios
+            var items = _entity
                 //.Include(u => u.Grupos)
                 //.Include(u => u.Derechos)
                 .Include(u => u.UsuarioActualizacion)
-                .ToListAsync();
+                .AsEnumerable();
 
             return items;
         }
 
-        public async Task<Usuario?> Get(Guid id)
-        {
-            var item = await _context.Usuarios.FirstOrDefaultAsync(i => i.ID == id);
-
-            return item;
+        public override async Task<Usuario?> GetAsync(Guid id)
+        {   
+            return await _entity.Where(e => e.ID == id).FirstOrDefaultAsync();
         }
 
-        public async Task Insert(Usuario item)
-        {
-            _context.Usuarios.Add(item);
-            await _context.SaveChangesAsync();
-        }
+        //public override async Task AddAsync(Usuario item)
+        //{   
+        //    await _entity.AddAsync(item);
+        //}
 
-        public async Task<bool> Update(Usuario item)
+        public async Task UpdateAsync(Usuario item)
         {
-            var currentItem = await Get(item.ID); // Obteniendolo de la base de datos para hacer las actualizaciones al registro
+            var currentItem = await GetAsync(item.ID); // Obteniendolo de la base de datos para hacer las actualizaciones al registro
             if (currentItem != null)
             {
                 currentItem.PersonaID = item.PersonaID;
@@ -60,25 +55,44 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 currentItem.Estatus = item.Estatus;
                 currentItem.Rol = item.Rol;
                 currentItem.FechaActualizacion = item.FechaActualizacion;
+
+                _entity.Update(currentItem);
             }
-            else return false;
-
-            int rowsAffected = await _context.SaveChangesAsync();
-
-            return rowsAffected > 0;
         }
 
-        public async Task<bool> Delete(Guid id)
+        public override async Task DeleteAsync(Guid id)
         {
-            var currentItem = await Get(id);
+            var currentItem = await GetAsync(id);
             if (currentItem != null)
             {
-                _context.Usuarios.Remove(currentItem);
-                int rowsAffected = await _context.SaveChangesAsync();
-                return rowsAffected > 0;
+                _entity.Remove(currentItem);
             }
+        }
 
-            return false;
+        public async Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default)
+        {
+            //TODO: Aqui algo no esta jalando!
+
+            username = username.ToUpper();
+            var total = await _entity
+                .Where(e => e.Username != null 
+                    && e.Username.ToUpper() == username
+                    && exceptionID == default ? true : e.ID != exceptionID)
+                .CountAsync();
+
+            return total > 0;
+        }
+
+        public async Task DeleteTmpByUpdaterUserIDAsync(Guid usuarioActualizacionID)
+        {
+            var users = await _entity
+                .Where(e => e.UsuarioActualizacionID == usuarioActualizacionID && e.Estatus == 0)
+                .ToListAsync();
+
+            foreach (var user in users)
+            {
+                _entity.Remove(user);
+            }
         }
     }
 }

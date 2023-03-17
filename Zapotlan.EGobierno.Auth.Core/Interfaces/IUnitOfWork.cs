@@ -7,10 +7,14 @@ using Zapotlan.EGobierno.Auth.Core.Entities;
 
 namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
-    public interface IPersonaRepository
+    public interface IUnitOfWork : IDisposable
     {
-        Task<IEnumerable<Persona>> Gets();
-        Task<Persona> Get(Guid id);
+        IRepository<Persona> PersonaRepository { get; }
 
+        IUsuarioRepository UsuarioRepository { get; }
+
+        void SaveChanges();
+
+        Task SaveChangesAsync();
     }
 }

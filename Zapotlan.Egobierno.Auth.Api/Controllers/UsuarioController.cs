@@ -22,28 +22,9 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Gets()
+        public ActionResult<IEnumerable<Usuario>> Gets()
         { 
-            var items = await _usuarioServices.Gets();
-            //var itemsDto = items.Select(i => new UsuarioDetailDto
-            //{ 
-            //    ID = i.ID,
-            //    PersonaID = i.PersonaID,
-            //    AreaID = i.AreaID,
-            //    EmpleadoID = i.EmpleadoID,
-            //    UsuarioJefeID = i.UsuarioJefeID,
-            //    Username = i.Username,
-            //    Password = i.Password,
-            //    Correo = i.Correo,
-            //    Puesto = i.Puesto,
-            //    Estatus = i.Estatus,
-            //    Rol = i.Rol,
-            //    FechaAlta = i.FechaAlta,
-            //    FechaVigencia = i.FechaVigencia,
-            //    ArchivoCartaResponsabilidad = i.ArchivoCartaResponsabilidad,
-            //    NombreUsernameActualizacion = i.UsuarioActualizacion?.Username ?? "",
-            //    FechaActualizacion = i.FechaActualizacion,
-            //});
+            var items = _usuarioServices.Gets().ToList();
             var itemsDto = _mapper.Map<IEnumerable<UsuarioDto>>(items);
             var response = new ApiResponse<IEnumerable<UsuarioDto>>(itemsDto);
 
@@ -53,7 +34,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var item = await _usuarioServices.Get(id);
+            var item = await _usuarioServices.GetAsync(id);
             var itemDto = _mapper.Map<UsuarioDto>(item);
             var response = new ApiResponse<UsuarioDto>(itemDto);
 
@@ -67,7 +48,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             item.ID = Guid.NewGuid();
             item.FechaActualizacion = DateTime.Now;
 
-            await _usuarioServices.Insert(item);
+            await _usuarioServices.AddAsync(item);
 
             itemDto = _mapper.Map<UsuarioDto>(item);
             var response = new ApiResponse<UsuarioDto>(itemDto);
@@ -82,7 +63,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             item.ID = id;
             item.FechaActualizacion = DateTime.Now;
 
-            var result = await _usuarioServices.Update(item);
+            var result = await _usuarioServices.UpdateAsync(item);
             var response = new ApiResponse<bool>(result);
 
             return Ok(response);
@@ -91,7 +72,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _usuarioServices.Delete(id);
+            var result = await _usuarioServices.DeleteAsync(id);
             var response = new ApiResponse<bool>(result);
 
             return Ok(response);

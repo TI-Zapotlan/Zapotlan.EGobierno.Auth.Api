@@ -24,6 +24,9 @@ builder.Services.AddDbContext<DataCenterContext>(options =>
 
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 
 //builder.Services.AddMvcCore(options => { // Sin uso porque se utiliza el de ApiController
 //    options.Filters.Add<ValidationFilters>();

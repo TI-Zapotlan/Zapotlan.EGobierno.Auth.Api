@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Zapotlan.EGobierno.Auth.Core.Entities
 {
-    public class Persona: BaseEntity 
+    public class Persona : BaseEntity 
     {
         public string? Prefijo { get; set; }
 
-        public string Nombres { get; set; }
+        public string Nombres { get; set; } = string.Empty;
 
         public string? PrimerApellido { get; set; }
 

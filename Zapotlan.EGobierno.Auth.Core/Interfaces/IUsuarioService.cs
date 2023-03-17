@@ -9,10 +9,10 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
     public interface IUsuarioService
     {
-        Task<IEnumerable<Usuario>> Gets();
-        Task<Usuario?> Get(Guid id);
-        Task Insert(Usuario item);
-        Task<bool> Update(Usuario item);
-        Task<bool> Delete(Guid id);
+        IEnumerable<Usuario> Gets();
+        Task<Usuario?> GetAsync(Guid id);
+        Task AddAsync(Usuario item);
+        Task<bool> UpdateAsync(Usuario item);
+        Task<bool> DeleteAsync(Guid id);
     }
 }
