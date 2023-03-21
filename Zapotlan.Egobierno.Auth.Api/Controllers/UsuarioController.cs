@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using Zapotlan.EGobierno.Auth.Api.Mappings;
 using Zapotlan.EGobierno.Auth.Api.Responses;
 using Zapotlan.EGobierno.Auth.Core.DTOs;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
+using Zapotlan.EGobierno.Auth.Core.QueryFilters;
 using Zapotlan.EGobierno.Auth.Infrastructure.Repositories;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
@@ -14,19 +17,23 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
     {
         private readonly IUsuarioService _usuarioServices;
         private readonly IMapper _mapper;
+        private readonly UsuariosMapping _usuariosMapping;
 
         public UsuarioController(IUsuarioService usuarioService, IMapper mapper)
         {
             _usuarioServices = usuarioService;
             _mapper = mapper;
+            _usuariosMapping = new UsuariosMapping(mapper);
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Usuario>> Gets()
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public IActionResult Gets([FromQuery]UsuarioQueryFilter filters)
         { 
-            var items = _usuarioServices.Gets().ToList();
-            var itemsDto = _mapper.Map<IEnumerable<UsuarioDto>>(items);
-            var response = new ApiResponse<IEnumerable<UsuarioDto>>(itemsDto);
+            var items = _usuarioServices.Gets(filters);
+            var itemsDto = _usuariosMapping.UsuarioToListDto(items); // _mapper.Map<IEnumerable<UsuarioDto>>(items);
+            var response = new ApiResponse<IEnumerable<UsuarioListDto>>(itemsDto);
 
             return Ok(response);
         }

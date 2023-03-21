@@ -23,6 +23,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new DerechoConfiguration());
             modelBuilder.ApplyConfiguration(new EmpleadoConfiguration());
             modelBuilder.ApplyConfiguration(new GrupoConfiguration());
+            modelBuilder.ApplyConfiguration(new PersonaConfiguration());
             modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
 
             modelBuilder.ApplyConfiguration(new DerechoGrupoConfiguration());

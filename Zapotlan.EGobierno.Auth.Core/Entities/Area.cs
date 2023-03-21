@@ -21,5 +21,13 @@
         public int Tipo { get; set; }
 
         public DateTime FechaAlta { get; set; }
+
+        // RELATIONS
+
+        // public virtual Area? AreaPadre { get; set; }
+
+        // public virtual ICollection<Empleado>? Empleados { get; set; }
+
+        public virtual ICollection<Usuario>? Usuarios { get; set; }
     }
 }

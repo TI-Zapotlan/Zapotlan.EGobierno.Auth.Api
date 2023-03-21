@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Zapotlan.EGobierno.Auth.Core.Entities;
+using Zapotlan.EGobierno.Auth.Core.Exceptions;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
+using Zapotlan.EGobierno.Auth.Core.QueryFilters;
 
 namespace Zapotlan.EGobierno.Auth.Core.Services
 {
@@ -21,11 +23,41 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
         // METHODS
 
-        public IEnumerable<Usuario> Gets()
+        public IEnumerable<Usuario> Gets(UsuarioQueryFilter filters)
         {
-            // Filtros de busqueda 
+            var items = _unitOfWork.UsuarioRepository.Gets();
 
-            return _unitOfWork.UsuarioRepository.Gets();
+            //// Filtros de busqueda 
+            //if (filters.AreaID != null && filters.AreaID != Guid.Empty)
+            //{
+            //    items = items.Where(u => u.AreaID == filters.AreaID);
+            //}
+
+            ////if (filters.GrupoID != Guid.Empty)
+            ////{
+            ////    items = items.Where(u => u.Grupos?.Where(g => g.ID == filters.GrupoID).Count() > 0);
+            ////}
+
+            //if (filters.UsuarioActualizacionID != null && filters.UsuarioActualizacionID != Guid.Empty)
+            //{
+            //    items = items.Where(u => u.UsuarioActualizacionID == filters.UsuarioActualizacionID);
+            //}
+
+            //if (!string.IsNullOrEmpty(filters.Username))
+            //{
+            //    items = items.Where(predicate: u => u.Username.ToLower().Contains(filters.Username.ToLower()));
+            //}
+
+            //if (!string.IsNullOrEmpty(filters.Nombre))
+            //{
+            //    items = items.Where(u => u.Persona.Nombres.ToLower().Contains(filters.Nombre.ToLower())
+            //        || u.Persona.PrimerApellido.ToLower().Contains(filters.Nombre.ToLower())
+            //        || u.Persona.SegundoApellido.ToLower().Contains(filters.Nombre.ToLower()));
+            //}
+
+            return items.ToList();
+
+            // return _unitOfWork.UsuarioRepository.Gets();
         }
 
         public async Task<Usuario?> GetAsync(Guid id)
@@ -53,12 +85,12 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             }
 
             // Validar que el username no exista
-            if (item.Username != null)
+            if (!string.IsNullOrEmpty(item.Username))
             {
                 bool existUsername = await _unitOfWork.UsuarioRepository.ExistUsernameAsync(item.Username, item.ID);
                 if (existUsername)
                 {
-                    throw new Exception("El nombre de usuario ya existe");
+                    throw new BusinessException("El nombre de usuario ya existe");
                 }
             }
 

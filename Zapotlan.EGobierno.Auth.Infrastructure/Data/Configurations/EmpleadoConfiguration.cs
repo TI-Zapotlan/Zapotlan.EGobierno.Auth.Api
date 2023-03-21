@@ -39,6 +39,9 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
             builder.Property(e => e.NombrePuesto)
                 .HasMaxLength(50);
 
+            builder.Property(e => e.SueldoDiario)
+                .HasColumnType("smallmoney");
+
             builder.Property(e => e.ModalidadIMSS)
                 .HasMaxLength(10);
 

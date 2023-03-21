@@ -39,13 +39,11 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         public virtual async Task AddAsync(T item)
         {
             await _entity.AddAsync(item);
-            // await _context.SaveChangesAsync();
         }
 
         public virtual void Update(T item) // la sincronia se va a hacer en el unitOfWork
         {
             _entity.Update(item);
-            // await _context.SaveChangesAsync();
         }
 
         public virtual async Task DeleteAsync(Guid id)
@@ -54,7 +52,6 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             if (item != null)
             {
                 _entity.Remove(item);
-                // await _context.SaveChangesAsync();
             }
         }
 
@@ -64,7 +61,6 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             if (item != null)
             {
                 _entity.Remove(item);
-                // await _context.SaveChangesAsync();
             }
         }
     }

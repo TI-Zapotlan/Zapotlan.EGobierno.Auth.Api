@@ -15,6 +15,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Mappings
         {
             CreateMap<Usuario, UsuarioDto>();
             CreateMap<UsuarioDto, Usuario>();
+            CreateMap<Usuario, UsuarioListDto>();
+            CreateMap<UsuarioListDto, Usuario>();
             CreateMap<Usuario, UsuarioUpdateDto>();
             CreateMap<UsuarioUpdateDto, Usuario>();
         }

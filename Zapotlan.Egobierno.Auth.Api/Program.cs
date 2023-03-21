@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 using Zapotlan.EGobierno.Auth.Core.Services;
 using Zapotlan.EGobierno.Auth.Infrastructure.Data;
+using Zapotlan.EGobierno.Auth.Infrastructure.Filters;
 using Zapotlan.EGobierno.Auth.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,10 +12,9 @@ var dataCenterConnection = builder.Configuration.GetConnectionString("DataCenter
 
 // Add services to the container.
 
-// xBlaze: Busca todos los profiles de Automapper en todos los proyectos => https://www.youtube.com/watch?v=DEOBWo2YodI
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => {
+    options.Filters.Add<GlobalExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -31,6 +31,9 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 //builder.Services.AddMvcCore(options => { // Sin uso porque se utiliza el de ApiController
 //    options.Filters.Add<ValidationFilters>();
 //});
+
+// xBlaze: Busca todos los profiles de Automapper en todos los proyectos => https://www.youtube.com/watch?v=DEOBWo2YodI
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddMvcCore();
 //builder.Services.AddFluentValidation(options => {

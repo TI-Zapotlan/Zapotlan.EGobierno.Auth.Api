@@ -37,6 +37,33 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
         public string? ArchivoCartaResponsabilidad { get; set; }
     }
 
+    public class UsuarioListDto
+    {
+        public Guid ID { get; set; }
+
+        public string? Codigo { get; set; }
+
+        public string? Username { get; set; }
+
+        public string? Password { get; set; }
+
+        public string? Correo { get; set; }
+
+        public string? Puesto { get; set; }
+
+        public int Estatus { get; set; }
+
+        public int Rol { get; set; }
+
+        public string? Nombres { get; set; }
+
+        public string? PrimerApellido { get; set; }
+
+        public string? SegundoApellido { get; set; }
+
+        public string? NombreArea { get; set; }
+    }
+
     public class UsuarioDetailDto
     {
         public Guid ID { get; set; }

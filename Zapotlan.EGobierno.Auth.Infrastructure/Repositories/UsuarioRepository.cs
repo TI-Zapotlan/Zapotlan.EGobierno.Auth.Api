@@ -21,9 +21,12 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         public override IEnumerable<Usuario> Gets()
         {
             var items = _entity
+                .Include(u => u.Area)
                 //.Include(u => u.Grupos)
                 //.Include(u => u.Derechos)
-                .Include(u => u.UsuarioActualizacion)
+                //.Include(u => u.Empleado)
+                .Include(u => u.Persona)
+                //.Include(u => u.UsuarioActualizacion)
                 .AsEnumerable();
 
             return items;
@@ -69,15 +72,14 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default)
+        // default(Guid) es la forma de decirle que va a recibir un Guid.Empty - ver: https://stackoverflow.com/questions/5117970/how-can-i-default-a-parameter-to-guid-empty-in-c
+        public async Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default(Guid))
         {
-            //TODO: Aqui algo no esta jalando!
-
             username = username.ToUpper();
             var total = await _entity
                 .Where(e => e.Username != null 
                     && e.Username.ToUpper() == username
-                    && exceptionID == default ? true : e.ID != exceptionID)
+                    && e.ID != exceptionID) // Cualquier ID va a ser diferente a Guid.Empty si exceptionID viene vacio
                 .CountAsync();
 
             return total > 0;

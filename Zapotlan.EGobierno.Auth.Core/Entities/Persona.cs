@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zapotlan.EGobierno.Auth.Core.Entities
 {
-    public class Persona : BaseEntity 
+    public class Persona : BaseEntity
     {
         public string? Prefijo { get; set; }
 
@@ -19,9 +19,6 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
         public string? CURP { get; set; }
 
         public int EstadoVida { get; set; }
-
-        // RELATIONS
-
 
     }
 }

@@ -19,6 +19,9 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
             builder.Property(e => e.ID)
                 .HasColumnName("IdArea");
 
+            builder.Property(e => e.AreaPadreID)
+                .HasColumnName("IdAreaPadre");
+
             builder.Property(e => e.Clave)
                 .HasMaxLength(25);
 

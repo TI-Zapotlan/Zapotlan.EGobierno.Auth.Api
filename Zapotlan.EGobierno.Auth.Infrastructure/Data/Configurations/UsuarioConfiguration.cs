@@ -57,6 +57,18 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
                 .HasColumnName("IdUsuarioActualizacion")
                 .IsRequired();
 
+            builder.HasOne(e => e.Area)
+                .WithMany(a => a.Usuarios)
+                .HasForeignKey(e => e.AreaID);
+
+            builder.HasOne(e => e.Persona)
+                .WithOne()
+                .HasForeignKey<Usuario>(e => e.PersonaID);
+
+            //builder.HasOne(e => e.Empleado)
+            //    .WithOne()
+            //    .HasForeignKey<Usuario>(e => e.EmpleadoID);
+
             builder.HasMany(e => e.Grupos)
                 .WithMany(g => g.Usuarios)
                 .UsingEntity<GrupoUsuario>(
