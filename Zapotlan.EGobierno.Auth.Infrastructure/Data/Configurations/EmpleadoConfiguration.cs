@@ -16,6 +16,10 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
             builder.ToTable("Empleados");
             builder.HasKey(e => e.ID);
 
+            builder.Property(e => e.ID)
+                .HasColumnName("IdEmpleado")
+                .IsRequired();
+
             builder.Property(e => e.PersonaID)
                 .HasColumnName("IdPersona")
                 .IsRequired();
@@ -47,6 +51,10 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
 
             builder.Property(e => e.TipoNomina)
                 .HasMaxLength(50);
+
+            builder.Property(e => e.UsuarioActualizacionID)
+                .HasColumnName("IdUsuarioActualizacion")
+                .IsRequired();
         }
     }
 }

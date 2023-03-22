@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Exceptions;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
@@ -13,49 +15,75 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
     public class UsuarioService : IUsuarioService
     {   
         private readonly IUnitOfWork _unitOfWork;
+        private readonly PaginationOptions _paginationOptions;
 
         // CONSTRUCTOR 
 
-        public UsuarioService(IUnitOfWork unitOfWork)
+        public UsuarioService(IUnitOfWork unitOfWork, IOptions<PaginationOptions> options)
         {
             _unitOfWork = unitOfWork;
+            _paginationOptions = options.Value;
         }
 
         // METHODS
 
-        public IEnumerable<Usuario> Gets(UsuarioQueryFilter filters)
+        public PagedList<Usuario> Gets(UsuarioQueryFilter filters)
         {
+            //filters.PageNumber = filters.PageNumber == 0 ? _paginationOptions.DefaultPageNumber : filters.PageNumber;
+            //filters.PageSize = filters.PageSize == 0 ? _paginationOptions.DefaultPagesize : filters.PageSize;
+
             var items = _unitOfWork.UsuarioRepository.Gets();
 
-            //// Filtros de busqueda 
-            //if (filters.AreaID != null && filters.AreaID != Guid.Empty)
-            //{
-            //    items = items.Where(u => u.AreaID == filters.AreaID);
-            //}
+            // Filtros de busqueda 
+            
+            if (filters.AreaID != null && filters.AreaID != Guid.Empty)
+            {
+                items = items.Where(u => u.AreaID == filters.AreaID);
+            }
 
-            ////if (filters.GrupoID != Guid.Empty)
-            ////{
-            ////    items = items.Where(u => u.Grupos?.Where(g => g.ID == filters.GrupoID).Count() > 0);
-            ////}
+            if (filters.UsuarioActualizacionID != null && filters.UsuarioActualizacionID != Guid.Empty)
+            {
+                items = items.Where(u => u.UsuarioActualizacionID == filters.UsuarioActualizacionID);
+            }
 
-            //if (filters.UsuarioActualizacionID != null && filters.UsuarioActualizacionID != Guid.Empty)
-            //{
-            //    items = items.Where(u => u.UsuarioActualizacionID == filters.UsuarioActualizacionID);
-            //}
+            if (!string.IsNullOrEmpty(filters.Codigo))
+            {
+                items = items.Where(u => 
+                    u.Empleado != null && (u.Empleado.Codigo != null && u.Empleado.Codigo.ToLower().Contains(filters.Codigo.ToLower()))
+                );
+            }
 
-            //if (!string.IsNullOrEmpty(filters.Username))
-            //{
-            //    items = items.Where(predicate: u => u.Username.ToLower().Contains(filters.Username.ToLower()));
-            //}
+            if (!string.IsNullOrEmpty(filters.Username))
+            {
+                items = items.Where(u =>
+                    u.Username != null && u.Username.ToLower().Contains(filters.Username.ToLower()));
+            }
 
-            //if (!string.IsNullOrEmpty(filters.Nombre))
-            //{
-            //    items = items.Where(u => u.Persona.Nombres.ToLower().Contains(filters.Nombre.ToLower())
-            //        || u.Persona.PrimerApellido.ToLower().Contains(filters.Nombre.ToLower())
-            //        || u.Persona.SegundoApellido.ToLower().Contains(filters.Nombre.ToLower()));
-            //}
+            if (!string.IsNullOrEmpty(filters.Nombre))
+            {
+                items = items.Where(u => 
+                    u.Persona != null && (
+                        u.Persona.Nombres.ToLower().Contains(filters.Nombre.ToLower())
+                        || (u.Persona.PrimerApellido != null && u.Persona.PrimerApellido.ToLower().Contains(filters.Nombre.ToLower()))
+                        || (u.Persona.SegundoApellido != null && u.Persona.SegundoApellido.ToLower().Contains(filters.Nombre.ToLower()))
+                    )
+                );
+            }
 
-            return items.ToList();
+            if (filters.Orden != null) { 
+
+            }
+            else if (filters.OrdenDesc != null)
+            { 
+
+            }
+            else {
+                items = items.OrderBy(u => u.Username);
+            }
+
+            var pagedItems = PagedList<Usuario>.Create(items, filters.PageNumber, filters.PageSize);
+
+            return pagedItems;
 
             // return _unitOfWork.UsuarioRepository.Gets();
         }

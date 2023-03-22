@@ -24,9 +24,9 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 .Include(u => u.Area)
                 //.Include(u => u.Grupos)
                 //.Include(u => u.Derechos)
-                //.Include(u => u.Empleado)
+                .Include(u => u.Empleado)
                 .Include(u => u.Persona)
-                //.Include(u => u.UsuarioActualizacion)
+                .Include(u => u.UsuarioActualizacion)
                 .AsEnumerable();
 
             return items;

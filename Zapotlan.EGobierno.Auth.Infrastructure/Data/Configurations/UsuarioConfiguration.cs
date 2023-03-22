@@ -61,13 +61,17 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
                 .WithMany(a => a.Usuarios)
                 .HasForeignKey(e => e.AreaID);
 
+            builder.HasOne(e => e.Empleado)
+                .WithOne()
+                .HasForeignKey<Usuario>(e => e.EmpleadoID);
+
             builder.HasOne(e => e.Persona)
                 .WithOne()
                 .HasForeignKey<Usuario>(e => e.PersonaID);
 
-            //builder.HasOne(e => e.Empleado)
-            //    .WithOne()
-            //    .HasForeignKey<Usuario>(e => e.EmpleadoID);
+            builder.HasOne(e => e.UsuarioActualizacion)
+                .WithOne()
+                .HasForeignKey<Usuario>(e => e.UsuarioActualizacionID);
 
             builder.HasMany(e => e.Grupos)
                 .WithMany(g => g.Usuarios)

@@ -22,6 +22,16 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
                 var itemDto = new UsuarioListDto();
                 itemDto = _mapper.Map<UsuarioListDto>(item);
 
+                if (item.Area != null)
+                {
+                    itemDto.NombreArea = item.Area.Nombre;
+                }
+
+                if (item.Empleado != null)
+                {
+                    itemDto.Codigo = item.Empleado.Codigo;
+                }
+
                 if (item.Persona != null)
                 {
                     itemDto.Nombres = item.Persona.Nombres;
@@ -29,10 +39,6 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
                     itemDto.SegundoApellido = item.Persona.SegundoApellido;
                 }
 
-                if (item.Area != null)
-                {
-                    itemDto.NombreArea = item.Area.Nombre;
-                }
 
                 itemsDto.Add(itemDto);
             }

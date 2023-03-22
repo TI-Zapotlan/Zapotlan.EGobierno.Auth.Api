@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Zapotlan.EGobierno.Auth.Api.Mappings;
 using Zapotlan.EGobierno.Auth.Api.Responses;
+using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.DTOs;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 using Zapotlan.EGobierno.Auth.Core.QueryFilters;
-using Zapotlan.EGobierno.Auth.Infrastructure.Repositories;
+using Zapotlan.EGobierno.Auth.Infrastructure.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
@@ -18,22 +19,53 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         private readonly IUsuarioService _usuarioServices;
         private readonly IMapper _mapper;
         private readonly UsuariosMapping _usuariosMapping;
+        private readonly IUriService _uriService;
 
-        public UsuarioController(IUsuarioService usuarioService, IMapper mapper)
+        public UsuarioController(IUsuarioService usuarioService, IMapper mapper, IUriService uriService)
         {
             _usuarioServices = usuarioService;
             _mapper = mapper;
             _usuariosMapping = new UsuariosMapping(mapper);
+            _uriService = uriService;
         }
 
-        [HttpGet]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        /// <summary>
+        /// Devuelve un listado de usuarios de acuerdo a los filtros establecidos
+        /// </summary>
+        /// <param name="filters">Listado de filtros disponibles</param>
+        /// <returns></returns>
+        [Produces("application/json")]
+        [HttpGet(Name = nameof(Gets))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<UsuarioListDto>>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult Gets([FromQuery]UsuarioQueryFilter filters)
         { 
             var items = _usuarioServices.Gets(filters);
             var itemsDto = _usuariosMapping.UsuarioToListDto(items); // _mapper.Map<IEnumerable<UsuarioDto>>(items);
-            var response = new ApiResponse<IEnumerable<UsuarioListDto>>(itemsDto);
+            var metadata = new Metadata
+            {
+                TotalCount = items.TotalCount,
+                PageSize = items.PageSize,
+                CurrentPage = items.CurrentPage,
+                TotalPages = items.TotalPages,
+                HasNextPage = items.HasNextPage,
+                HasPreviousPage = items.HasPreviousPage,
+                NextPageUrl = _uriService.GetUsuarioPaginationUri(
+                    filters,
+                    Url.RouteUrl(nameof(Gets))
+                    //, items.NextPageNumber
+                ).ToString(),
+                PreviousPageUrl = _uriService.GetUsuarioPaginationUri(
+                    filters,
+                    Url.RouteUrl(nameof(Gets))
+                ).ToString()
+            };
+
+            var response = new ApiResponse<IEnumerable<UsuarioListDto>>(itemsDto) {
+                Meta = metadata
+            };
+
+            // Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
             return Ok(response);
         }
