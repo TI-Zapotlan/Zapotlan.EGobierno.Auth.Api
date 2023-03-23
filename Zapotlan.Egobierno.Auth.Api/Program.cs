@@ -34,6 +34,8 @@ builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("
 builder.Services.AddDbContext<DataCenterContext>(options => 
     options.UseSqlServer(dataCenterConnection));
 
+builder.Services.AddTransient<IAreaService, AreaService>();
+builder.Services.AddTransient<IPersonaService, PersonaService>();
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();

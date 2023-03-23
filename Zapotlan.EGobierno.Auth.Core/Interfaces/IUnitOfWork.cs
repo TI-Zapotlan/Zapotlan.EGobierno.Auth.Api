@@ -9,6 +9,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
+        IRepository<Area> AreaRepository { get; }
         IRepository<Persona> PersonaRepository { get; }
 
         IUsuarioRepository UsuarioRepository { get; }

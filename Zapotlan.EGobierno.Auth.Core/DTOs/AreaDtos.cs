@@ -1,9 +1,16 @@
-﻿using Zapotlan.EGobierno.Auth.Core.Enumerations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
 
-namespace Zapotlan.EGobierno.Auth.Core.Entities
+namespace Zapotlan.EGobierno.Auth.Core.DTOs
 {
-    public class Area : BaseEntity
-    {   
+    public class AreaDto
+    {
+        public Guid ID { get; set; }
+
         public Guid? AreaPadreID { get; set; }
 
         public string? Clave { get; set; }
@@ -24,14 +31,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public DateTime FechaAlta { get; set; }
 
-        // RELATIONS
+        public Guid UsuarioActualizacionID { get; set; }
 
-        public virtual Area? AreaPadre { get; set; }
-
-        public virtual ICollection<Area>? AreasHijo { get; set; }
-
-        public virtual ICollection<Empleado>? Empleados { get; set; }
-
-        public virtual ICollection<Usuario>? Usuarios { get; set; }
+        public DateTime FechaActualizacion { get; set; }
     }
 }

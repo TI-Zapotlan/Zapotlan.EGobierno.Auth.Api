@@ -13,6 +13,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Mappings
     {
         public AutomapperProfile() 
         {
+            CreateMap<Area, AreaDto>();
+            CreateMap<AreaDto, Area>();
             CreateMap<Usuario, UsuarioDto>();
             CreateMap<UsuarioDto, Usuario>();
             CreateMap<Usuario, UsuarioListDto>();

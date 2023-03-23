@@ -13,6 +13,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
     {
         private readonly DataCenterContext _context;
 
+        private readonly IRepository<Area> _areaRepository;
         private readonly IRepository<Persona> _personaRepository;
         private readonly IUsuarioRepository _usuarioRepository;
 
@@ -20,6 +21,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         {
             _context = context; 
         }
+
+        public IRepository<Area> AreaRepository => _areaRepository ?? new BaseRepository<Area>(_context);
 
         public IRepository<Persona> PersonaRepository => _personaRepository ?? new BaseRepository<Persona>(_context);
 

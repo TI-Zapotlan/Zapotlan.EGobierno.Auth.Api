@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 
 namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
@@ -52,6 +47,14 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
             builder.Property(e => e.UsuarioActualizacionID)
                 .HasColumnName("IdUsuarioActualizacion")
                 .IsRequired();
+
+            builder.HasOne(e => e.AreaPadre)
+                .WithMany(e => e.AreasHijo)
+                .HasForeignKey(e => e.AreaPadreID);
+
+            builder.HasMany(e => e.Empleados)
+                .WithOne(e => e.Area)
+                .HasForeignKey(e => e.AreaID);
         }
     }
 }

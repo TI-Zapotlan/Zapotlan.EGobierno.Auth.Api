@@ -22,8 +22,6 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         {
             var items = _entity
                 .Include(u => u.Area)
-                //.Include(u => u.Grupos)
-                //.Include(u => u.Derechos)
                 .Include(u => u.Empleado)
                 .Include(u => u.Persona)
                 .Include(u => u.UsuarioActualizacion)
@@ -34,7 +32,14 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
 
         public override async Task<Usuario?> GetAsync(Guid id)
         {   
-            return await _entity.Where(e => e.ID == id).FirstOrDefaultAsync();
+            return await _entity.Where(e => e.ID == id)
+                .Include(u => u.Area)
+                .Include(u => u.Grupos)
+                .Include(u => u.Derechos)
+                .Include(u => u.Empleado)
+                .Include(u => u.Persona)
+                .Include(u => u.UsuarioActualizacion)
+                .FirstOrDefaultAsync();
         }
 
         //public override async Task AddAsync(Usuario item)

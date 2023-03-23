@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
 
 namespace Zapotlan.EGobierno.Auth.Core.Entities
 {
@@ -18,7 +19,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? CURP { get; set; }
 
-        public int EstadoVida { get; set; }
+        public PersonaEstadoVidaTipo EstadoVida { get; set; }
 
     }
 }

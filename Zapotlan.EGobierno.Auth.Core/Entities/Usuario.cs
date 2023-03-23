@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
 
 namespace Zapotlan.EGobierno.Auth.Core.Entities
 {
@@ -20,9 +21,9 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? Puesto { get; set; }
 
-        public int Estatus { get; set; }
+        public UsuarioEstatusTipo Estatus { get; set; }
 
-        public int Rol { get; set; }
+        public UsuarioRolTipo Rol { get; set; }
 
         public DateTime FechaAlta { get; set; }
 

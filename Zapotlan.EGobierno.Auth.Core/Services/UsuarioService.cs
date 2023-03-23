@@ -70,15 +70,31 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
                 );
             }
 
-            if (filters.Orden != null) { 
+            // Ordenamiento 
 
-            }
-            else if (filters.OrdenDesc != null)
-            { 
-
-            }
-            else {
-                items = items.OrderBy(u => u.Username);
+            switch (filters.Orden)
+            {
+                case Enumerations.UsuarioOrdenFilterTipo.Username:
+                    items = items.OrderBy(u => u.Username);
+                    break;
+                case Enumerations.UsuarioOrdenFilterTipo.Nombre:
+                    items = items.OrderBy(u => u.Persona != null ? u.Persona.Nombres : u.Username);
+                    break;
+                case Enumerations.UsuarioOrdenFilterTipo.FechaAlta:
+                    items = items.OrderBy(u => u.FechaAlta);
+                    break;
+                case Enumerations.UsuarioOrdenFilterTipo.UsernameDesc:
+                    items = items.OrderByDescending(u => u.Username);
+                    break;
+                case Enumerations.UsuarioOrdenFilterTipo.NombreDesc:
+                    items = items.OrderByDescending(u => u.Persona != null ? u.Persona.Nombres : u.Username);
+                    break;
+                case Enumerations.UsuarioOrdenFilterTipo.FechaAltaDesc:
+                    items = items.OrderByDescending(u => u.FechaAlta);
+                    break;
+                default:
+                    items = items.OrderBy(u => u.Username);
+                    break;
             }
 
             var pagedItems = PagedList<Usuario>.Create(items, filters.PageNumber, filters.PageSize);
@@ -108,8 +124,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
         {
             // INFO: Aquí van las validaciones
 
-            if (item.Estatus == 0) { // Es un registo nuevo
-                item.Estatus = 1;
+            if (item.Estatus == Enumerations.UsuarioEstatusTipo.Ninguno) { // Es un registo nuevo
+                item.Estatus = Enumerations.UsuarioEstatusTipo.Activo;
             }
 
             // Validar que el username no exista

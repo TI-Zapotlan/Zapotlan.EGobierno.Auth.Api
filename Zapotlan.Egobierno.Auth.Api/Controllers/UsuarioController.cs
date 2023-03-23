@@ -35,10 +35,10 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         /// <param name="filters">Listado de filtros disponibles</param>
         /// <returns></returns>
         [Produces("application/json")]
-        [HttpGet(Name = nameof(Gets))]
+        [HttpGet(Name = nameof(GetsUsuarios))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<UsuarioListDto>>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult Gets([FromQuery]UsuarioQueryFilter filters)
+        public IActionResult GetsUsuarios([FromQuery]UsuarioQueryFilter filters)
         { 
             var items = _usuarioServices.Gets(filters);
             var itemsDto = _usuariosMapping.UsuarioToListDto(items); // _mapper.Map<IEnumerable<UsuarioDto>>(items);
@@ -52,12 +52,12 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
                 HasPreviousPage = items.HasPreviousPage,
                 NextPageUrl = _uriService.GetUsuarioPaginationUri(
                     filters,
-                    Url.RouteUrl(nameof(Gets))
+                    Url.RouteUrl(nameof(GetsUsuarios))
                     //, items.NextPageNumber
                 ).ToString(),
                 PreviousPageUrl = _uriService.GetUsuarioPaginationUri(
                     filters,
-                    Url.RouteUrl(nameof(Gets))
+                    Url.RouteUrl(nameof(GetsUsuarios))
                 ).ToString()
             };
 
@@ -71,7 +71,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> GetUsuario(Guid id)
         {
             var item = await _usuarioServices.GetAsync(id);
             var itemDto = _mapper.Map<UsuarioDto>(item);
@@ -81,7 +81,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(UsuarioDto itemDto)
+        public async Task<IActionResult> PostUsuario(UsuarioDto itemDto)
         {
             var item = _mapper.Map<Usuario>(itemDto);
             item.ID = Guid.NewGuid();
@@ -96,7 +96,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(Guid id, UsuarioUpdateDto itemDto)
+        public async Task<IActionResult> PutUsuario(Guid id, UsuarioUpdateDto itemDto)
         {
             var item = _mapper.Map<Usuario>(itemDto);
             item.ID = id;
@@ -109,7 +109,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> DeleteUsuario(Guid id)
         {
             var result = await _usuarioServices.DeleteAsync(id);
             var response = new ApiResponse<bool>(result);
