@@ -15,10 +15,15 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Mappings
         {
             CreateMap<Area, AreaDto>();
             CreateMap<AreaDto, Area>();
+
             CreateMap<Usuario, UsuarioDto>();
             CreateMap<UsuarioDto, Usuario>();
             CreateMap<Usuario, UsuarioListDto>();
             CreateMap<UsuarioListDto, Usuario>();
+            CreateMap<Usuario, UsuarioDetailDto>()
+                .ForMember(dto => dto.Grupos, o => o.Ignore())
+                .ForMember(dto => dto.Derechos, o => o.Ignore());
+            CreateMap<UsuarioDetailDto, Usuario>();
             CreateMap<Usuario, UsuarioUpdateDto>();
             CreateMap<UsuarioUpdateDto, Usuario>();
         }

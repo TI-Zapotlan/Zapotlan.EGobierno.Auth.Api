@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
 
 namespace Zapotlan.EGobierno.Auth.Core.Entities
 {
@@ -13,7 +14,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? Descripcion { get; set; }
 
-        public int Acceso { get; set; }
+        public DerechoAccesoTipo Acceso { get; set; }
 
         // RELATIONS
 

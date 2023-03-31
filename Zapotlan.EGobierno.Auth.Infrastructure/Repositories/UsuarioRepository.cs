@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Zapotlan.EGobierno.Auth.Core.Entities;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
+using Zapotlan.EGobierno.Auth.Core.Exceptions;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 using Zapotlan.EGobierno.Auth.Infrastructure.Data;
 
@@ -35,6 +34,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             return await _entity.Where(e => e.ID == id)
                 .Include(u => u.Area)
                 .Include(u => u.Grupos)
+                    .ThenInclude(g => g.Derechos)
                 .Include(u => u.Derechos)
                 .Include(u => u.Empleado)
                 .Include(u => u.Persona)
@@ -48,8 +48,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         //}
 
         public async Task UpdateAsync(Usuario item)
-        {
-            var currentItem = await GetAsync(item.ID); // Obteniendolo de la base de datos para hacer las actualizaciones al registro
+        {   
+            var currentItem = await _entity.FindAsync(item.ID);
             if (currentItem != null)
             {
                 currentItem.PersonaID = item.PersonaID;
@@ -57,7 +57,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 currentItem.EmpleadoID = item.EmpleadoID;
                 currentItem.UsuarioJefeID = item.UsuarioJefeID;
                 currentItem.Username = item.Username;
-                currentItem.Password = item.Password;
+                currentItem.Password = string.IsNullOrEmpty(item.Password) ? currentItem.Password : GetMD5Hash(item.Password);
                 currentItem.Correo = item.Correo;
                 currentItem.Puesto = item.Puesto;
                 currentItem.Estatus = item.Estatus;
@@ -65,6 +65,10 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 currentItem.FechaActualizacion = item.FechaActualizacion;
 
                 _entity.Update(currentItem);
+            }
+            else
+            {
+                throw new BusinessException("No se encontró el registro en la base de datos.");
             }
         }
 
@@ -93,7 +97,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         public async Task DeleteTmpByUpdaterUserIDAsync(Guid usuarioActualizacionID)
         {
             var users = await _entity
-                .Where(e => e.UsuarioActualizacionID == usuarioActualizacionID && e.Estatus == 0)
+                .Where(e => e.UsuarioActualizacionID == usuarioActualizacionID && e.Estatus == UsuarioEstatusTipo.Ninguno)
                 .ToListAsync();
 
             foreach (var user in users)
@@ -101,5 +105,48 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 _entity.Remove(user);
             }
         }
+
+        public async Task<bool> IsUserValid(Guid id)
+        {
+            var user = await _entity.FindAsync(id);
+            if (user != null)
+            {
+                // HACK: Aqui valtan más validaciones
+
+                if (user.Estatus == UsuarioEstatusTipo.Activo)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public async Task<Usuario?> LoginAsync(string username, string password)
+        {
+            var encryptedPwd = GetMD5Hash(password);
+            var user = await _entity
+                .Where(u => u.Username == username && u.Password == encryptedPwd)
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
+
+        private string GetMD5Hash(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
+
+            MD5 mD5 = MD5.Create();
+            byte[] data = mD5.ComputeHash(Encoding.Default.GetBytes(value));
+            StringBuilder sBuilder = new();
+            int i;
+
+            for (i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            return sBuilder.ToString();
+        } // GetMD5Hash
     }
 }

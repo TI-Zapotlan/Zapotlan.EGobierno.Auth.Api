@@ -7,9 +7,15 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
     public interface IUsuarioService
     {
         PagedList<Usuario> Gets(UsuarioQueryFilter filters);
+
         Task<Usuario?> GetAsync(Guid id);
-        Task AddAsync(Usuario item);
-        Task<bool> UpdateAsync(Usuario item);
+
+        Task<Usuario> AddAsync(Usuario item);
+
+        Task<Usuario> UpdateAsync(Usuario item);
+
         Task<bool> DeleteAsync(Guid id);
+
+        Task<Usuario?> LoginAsync(string username, string password);
     }
 }

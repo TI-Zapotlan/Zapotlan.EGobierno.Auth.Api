@@ -57,6 +57,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
                 .HasColumnName("IdUsuarioActualizacion")
                 .IsRequired();
 
+            // RELATIONS
+
             builder.HasOne(e => e.Area)
                 .WithMany(a => a.Usuarios)
                 .HasForeignKey(e => e.AreaID);

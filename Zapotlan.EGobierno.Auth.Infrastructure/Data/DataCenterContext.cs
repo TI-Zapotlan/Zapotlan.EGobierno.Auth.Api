@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using Zapotlan.EGobierno.Auth.Core.Entities;
-using Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations;
 
 namespace Zapotlan.EGobierno.Auth.Infrastructure.Data
 {
@@ -19,16 +19,21 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data
         { 
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new AreaConfiguration());
-            modelBuilder.ApplyConfiguration(new DerechoConfiguration());
-            modelBuilder.ApplyConfiguration(new EmpleadoConfiguration());
-            modelBuilder.ApplyConfiguration(new GrupoConfiguration());
-            modelBuilder.ApplyConfiguration(new PersonaConfiguration());
-            modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
+            //modelBuilder.Conventions.Remove<ManyToManyCascadeDeleteConvention>();
 
-            modelBuilder.ApplyConfiguration(new DerechoGrupoConfiguration());
-            modelBuilder.ApplyConfiguration(new DerechoUsuarioConfiguration());
-            modelBuilder.ApplyConfiguration(new GrupoUsuarioConfiguration());
+            //modelBuilder.ApplyConfiguration(new AreaConfiguration());
+            //modelBuilder.ApplyConfiguration(new DerechoConfiguration());
+            //modelBuilder.ApplyConfiguration(new EmpleadoConfiguration());
+            //modelBuilder.ApplyConfiguration(new GrupoConfiguration());
+            //modelBuilder.ApplyConfiguration(new PersonaConfiguration());
+            //modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
+
+            //modelBuilder.ApplyConfiguration(new DerechoGrupoConfiguration());
+            //modelBuilder.ApplyConfiguration(new DerechoUsuarioConfiguration());
+            //modelBuilder.ApplyConfiguration(new GrupoUsuarioConfiguration());
+
+            // Este equivale a todos los anteriores, va y busca los IEntityTypeConfiguration y los aplica
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         }
     }

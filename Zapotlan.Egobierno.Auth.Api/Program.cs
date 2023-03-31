@@ -1,7 +1,11 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Text;
 using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 using Zapotlan.EGobierno.Auth.Core.Services;
@@ -27,6 +31,12 @@ builder.Services.AddSwaggerGen(options => {
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+        Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
 });
 
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("ZapPagination"));
@@ -52,6 +62,23 @@ builder.Services.AddSingleton<IUriService>(provider => {
 // xBlaze: Busca todos los profiles de Automapper en todos los proyectos => https://www.youtube.com/watch?v=DEOBWo2YodI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddAuthentication(o => { 
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o => {
+    o.TokenValidationParameters = new TokenValidationParameters { 
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Authentication:Issuer"],
+        ValidAudience = builder.Configuration["Authentication:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Authentication:SecretKey"]))
+    };
+});
+
+// Casi todo va antes de cargar MVC
+
 builder.Services.AddMvcCore();
 // La forma anterior es obsoleta, basado en: https://stackoverflow.com/questions/73402059/asp-net-core-web-api-fluentvalidationmvcextensions-addfluentvalidationimvcbui
 builder.Services.AddFluentValidationAutoValidation();
@@ -67,6 +94,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

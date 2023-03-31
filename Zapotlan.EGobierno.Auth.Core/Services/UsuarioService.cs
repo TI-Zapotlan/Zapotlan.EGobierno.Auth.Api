@@ -1,11 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.Entities;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
 using Zapotlan.EGobierno.Auth.Core.Exceptions;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 using Zapotlan.EGobierno.Auth.Core.QueryFilters;
@@ -74,22 +70,22 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
             switch (filters.Orden)
             {
-                case Enumerations.UsuarioOrdenFilterTipo.Username:
+                case UsuarioOrdenFilterTipo.Username:
                     items = items.OrderBy(u => u.Username);
                     break;
-                case Enumerations.UsuarioOrdenFilterTipo.Nombre:
+                case UsuarioOrdenFilterTipo.Nombre:
                     items = items.OrderBy(u => u.Persona != null ? u.Persona.Nombres : u.Username);
                     break;
-                case Enumerations.UsuarioOrdenFilterTipo.FechaAlta:
+                case UsuarioOrdenFilterTipo.FechaAlta:
                     items = items.OrderBy(u => u.FechaAlta);
                     break;
-                case Enumerations.UsuarioOrdenFilterTipo.UsernameDesc:
+                case UsuarioOrdenFilterTipo.UsernameDesc:
                     items = items.OrderByDescending(u => u.Username);
                     break;
-                case Enumerations.UsuarioOrdenFilterTipo.NombreDesc:
+                case UsuarioOrdenFilterTipo.NombreDesc:
                     items = items.OrderByDescending(u => u.Persona != null ? u.Persona.Nombres : u.Username);
                     break;
-                case Enumerations.UsuarioOrdenFilterTipo.FechaAltaDesc:
+                case UsuarioOrdenFilterTipo.FechaAltaDesc:
                     items = items.OrderByDescending(u => u.FechaAlta);
                     break;
                 default:
@@ -109,18 +105,33 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             return await _unitOfWork.UsuarioRepository.GetAsync(id);
         }
 
-        public async Task AddAsync(Usuario item)
+        public async Task<Usuario> AddAsync(Usuario item)
         {
             // INFO: Validaciones minimas, solo es para crear registros temporales
+
+            if (item.UsuarioActualizacionID == Guid.Empty)
+            {
+                throw new BusinessException("Faltó especificar el identificador del usuario que ejecuta la aplicación");
+            }
+            else
+            {
+                if (!await _unitOfWork.UsuarioRepository.IsUserValid(item.UsuarioActualizacionID))
+                {
+                    throw new BusinessException("El usuario no tiene los privilegios para crear un nuevo usuario.");
+                }
+            }
 
             // Eliminar registros temporales del usuario
             await _unitOfWork.UsuarioRepository.DeleteTmpByUpdaterUserIDAsync(item.UsuarioActualizacionID);
 
+            // Generación del nuevo registro
             await _unitOfWork.UsuarioRepository.AddAsync(item);
             await _unitOfWork.SaveChangesAsync();
+
+            return item;
         }
 
-        public async Task<bool> UpdateAsync(Usuario item)
+        public async Task<Usuario> UpdateAsync(Usuario item)
         {
             // INFO: Aquí van las validaciones
 
@@ -141,7 +152,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             await _unitOfWork.UsuarioRepository.UpdateAsync(item);
             await _unitOfWork.SaveChangesAsync();
 
-            return true; //Todo: Cambiarlo por el objeto completo que se actualizó
+            return item;
         }
 
         public async Task<bool> DeleteAsync(Guid id)
@@ -151,7 +162,25 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             await _unitOfWork.UsuarioRepository.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return true; //Todo: Cambiarlo por el objeto completo que se eliminó
+            return true;
         }
+
+        public async Task<Usuario?> LoginAsync(string username, string password)
+        {   
+            var user = await _unitOfWork.UsuarioRepository.LoginAsync(username, password);
+
+            if (user == null)
+            {
+                throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
+            }
+
+            if (user.Estatus != UsuarioEstatusTipo.Activo)
+            {
+                throw new BusinessException("El usuario no se encuentra activo.");
+            }
+
+            return user;
+        }
+
     }
 }

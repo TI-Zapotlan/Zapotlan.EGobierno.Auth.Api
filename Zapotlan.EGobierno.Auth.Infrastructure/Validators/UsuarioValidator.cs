@@ -10,8 +10,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Validators
             RuleFor(i => i.Username)
                 .MaximumLength(25);
 
-            RuleFor(i => i.Estatus)
-                .InclusiveBetween(0, 3);
+            //RuleFor(i => i.Estatus)
+            //    .InclusiveBetween(0, 3);
         }
     }
 }

@@ -13,5 +13,9 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
         Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default);
 
         Task DeleteTmpByUpdaterUserIDAsync(Guid id);
+
+        Task<bool> IsUserValid(Guid id);
+
+        Task<Usuario?> LoginAsync(string username, string password);
     }
 }
