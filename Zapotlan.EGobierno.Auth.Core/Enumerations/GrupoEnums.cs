@@ -6,22 +6,12 @@ using System.Threading.Tasks;
 
 namespace Zapotlan.EGobierno.Auth.Core.Enumerations
 {
-    public enum DerechoAccesoType
+    public enum GrupoOrderFilterType
     {
         Ninguno,
-        Normal,
-        PermitirTodos,
-        DenegarTodos
-    }
-
-    public enum DerechoOrderFilterType
-    { 
-        Ninguno,
-        ID,
         Nombre,
         FechaActualizacion,
-        IDDesc,
         NombreDesc,
-        FechaActualizacionDesc
+        FechaActualizacionDesc,
     }
 }

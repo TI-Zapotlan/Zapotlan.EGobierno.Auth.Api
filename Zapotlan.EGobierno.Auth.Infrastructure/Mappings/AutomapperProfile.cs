@@ -13,11 +13,26 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Mappings
     {
         public AutomapperProfile() 
         {
+            // Areas
             CreateMap<Area, AreaDto>();
             CreateMap<AreaDto, Area>();
 
-            CreateMap<Usuario, UsuarioDto>();
-            CreateMap<UsuarioDto, Usuario>();
+            // Derechos
+            CreateMap<Derecho, DerechoListDto>().ReverseMap();
+
+            // Grupos
+            CreateMap<Grupo, GrupoDto>().ReverseMap();
+            CreateMap<Grupo, GrupoListDto>().ReverseMap();
+            CreateMap<Grupo, GrupoDetailsDto>()                
+                .ForMember(dto => dto.Usuarios, o => o.Ignore())
+                .ForMember(dto => dto.Derechos, o => o.Ignore());
+            CreateMap<GrupoDetailsDto, Grupo>();
+            CreateMap<Grupo, GrupoInsertDto>().ReverseMap();
+            CreateMap<Grupo, GrupoUpdateDto>().ReverseMap();
+
+            //Usuarios 
+            CreateMap<Usuario, UsuarioDto>().ReverseMap(); // Esta linea sustituye a la siguiente.
+            // CreateMap<UsuarioDto, Usuario>();
             CreateMap<Usuario, UsuarioListDto>();
             CreateMap<UsuarioListDto, Usuario>();
             CreateMap<Usuario, UsuarioDetailDto>()
@@ -29,3 +44,4 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Mappings
         }
     }
 }
+

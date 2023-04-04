@@ -21,9 +21,9 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? Puesto { get; set; }
 
-        public UsuarioEstatusTipo Estatus { get; set; }
+        public UsuarioEstatusType Estatus { get; set; }
 
-        public UsuarioRolTipo Rol { get; set; }
+        public UsuarioRolType Rol { get; set; }
 
         public DateTime FechaAlta { get; set; }
 

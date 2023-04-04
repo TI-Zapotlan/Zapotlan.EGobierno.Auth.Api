@@ -15,6 +15,9 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
 
         private readonly IRepository<Area> _areaRepository;
         private readonly IRepository<Persona> _personaRepository;
+
+        private readonly IDerechoRepository _derechoRepository;
+        private readonly IGrupoRepository _grupoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
 
         public UnitOfWork(DataCenterContext context)
@@ -23,9 +26,10 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         }
 
         public IRepository<Area> AreaRepository => _areaRepository ?? new BaseRepository<Area>(_context);
-
         public IRepository<Persona> PersonaRepository => _personaRepository ?? new BaseRepository<Persona>(_context);
 
+        public IDerechoRepository DerechoRepository => _derechoRepository ?? new DerechoRepository(_context);
+        public IGrupoRepository GrupoRepository => _grupoRepository ?? new GrupoRepository(_context);
         public IUsuarioRepository UsuarioRepository => _usuarioRepository ?? new UsuarioRepository(_context);
 
         public void Dispose() => _context?.Dispose();        

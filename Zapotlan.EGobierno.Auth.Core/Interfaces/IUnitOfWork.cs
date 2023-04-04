@@ -12,6 +12,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
         IRepository<Area> AreaRepository { get; }
         IRepository<Persona> PersonaRepository { get; }
 
+        IDerechoRepository DerechoRepository { get;  }
+        IGrupoRepository GrupoRepository { get; }
         IUsuarioRepository UsuarioRepository { get; }
 
         void SaveChanges();

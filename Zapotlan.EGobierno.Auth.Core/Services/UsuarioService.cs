@@ -37,6 +37,18 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
                 items = items.Where(u => u.AreaID == filters.AreaID);
             }
 
+            if (filters.DerechoID != null)
+            {
+                items = items.Where(e => e.Derechos != null
+                    && e.Derechos.Where(d => d.DerechoID == filters.DerechoID).Any());
+            }
+
+            if (filters.GrupoID != null && filters.GrupoID != Guid.Empty)
+            {
+                items = items.Where(e => e.Grupos != null
+                    && e.Grupos.Where(g => g.ID == filters.GrupoID).Any());
+            }
+
             if (filters.UsuarioActualizacionID != null && filters.UsuarioActualizacionID != Guid.Empty)
             {
                 items = items.Where(u => u.UsuarioActualizacionID == filters.UsuarioActualizacionID);
@@ -70,22 +82,22 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
             switch (filters.Orden)
             {
-                case UsuarioOrdenFilterTipo.Username:
+                case UsuarioOrderFilterType.Username:
                     items = items.OrderBy(u => u.Username);
                     break;
-                case UsuarioOrdenFilterTipo.Nombre:
+                case UsuarioOrderFilterType.Nombre:
                     items = items.OrderBy(u => u.Persona != null ? u.Persona.Nombres : u.Username);
                     break;
-                case UsuarioOrdenFilterTipo.FechaAlta:
+                case UsuarioOrderFilterType.FechaAlta:
                     items = items.OrderBy(u => u.FechaAlta);
                     break;
-                case UsuarioOrdenFilterTipo.UsernameDesc:
+                case UsuarioOrderFilterType.UsernameDesc:
                     items = items.OrderByDescending(u => u.Username);
                     break;
-                case UsuarioOrdenFilterTipo.NombreDesc:
+                case UsuarioOrderFilterType.NombreDesc:
                     items = items.OrderByDescending(u => u.Persona != null ? u.Persona.Nombres : u.Username);
                     break;
-                case UsuarioOrdenFilterTipo.FechaAltaDesc:
+                case UsuarioOrderFilterType.FechaAltaDesc:
                     items = items.OrderByDescending(u => u.FechaAlta);
                     break;
                 default:
@@ -135,8 +147,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
         {
             // INFO: Aquí van las validaciones
 
-            if (item.Estatus == Enumerations.UsuarioEstatusTipo.Ninguno) { // Es un registo nuevo
-                item.Estatus = Enumerations.UsuarioEstatusTipo.Activo;
+            if (item.Estatus == UsuarioEstatusType.Ninguno) { // Es un registo nuevo
+                item.Estatus = UsuarioEstatusType.Activo;
             }
 
             // Validar que el username no exista
@@ -174,12 +186,19 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
                 throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
             }
 
-            if (user.Estatus != UsuarioEstatusTipo.Activo)
+            if (user.Estatus != UsuarioEstatusType.Activo)
             {
                 throw new BusinessException("El usuario no se encuentra activo.");
             }
 
             return user;
+        }
+
+        public async Task<bool> HasPermisionAsync(Guid id, int derecho)
+        {
+
+
+            return false;
         }
 
     }

@@ -72,14 +72,14 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             }
         }
 
-        public override async Task DeleteAsync(Guid id)
-        {
-            var currentItem = await GetAsync(id);
-            if (currentItem != null)
-            {
-                _entity.Remove(currentItem);
-            }
-        }
+        //public override async Task DeleteAsync(Guid id)
+        //{
+        //    var currentItem = await GetAsync(id);
+        //    if (currentItem != null)
+        //    {
+        //        _entity.Remove(currentItem);
+        //    }
+        //}
 
         // default(Guid) es la forma de decirle que va a recibir un Guid.Empty - ver: https://stackoverflow.com/questions/5117970/how-can-i-default-a-parameter-to-guid-empty-in-c
         public async Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default(Guid))
@@ -97,7 +97,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         public async Task DeleteTmpByUpdaterUserIDAsync(Guid usuarioActualizacionID)
         {
             var users = await _entity
-                .Where(e => e.UsuarioActualizacionID == usuarioActualizacionID && e.Estatus == UsuarioEstatusTipo.Ninguno)
+                .Where(e => e.UsuarioActualizacionID == usuarioActualizacionID && e.Estatus == UsuarioEstatusType.Ninguno)
                 .ToListAsync();
 
             foreach (var user in users)
@@ -113,7 +113,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             {
                 // HACK: Aqui valtan más validaciones
 
-                if (user.Estatus == UsuarioEstatusTipo.Activo)
+                if (user.Estatus == UsuarioEstatusType.Activo)
                 {
                     return true;
                 }

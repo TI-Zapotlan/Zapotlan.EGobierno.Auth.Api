@@ -19,7 +19,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? CURP { get; set; }
 
-        public PersonaEstadoVidaTipo EstadoVida { get; set; }
+        public PersonaEstadoVidaType EstadoVida { get; set; }
 
     }
 }

@@ -4,12 +4,6 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
     public interface IUsuarioRepository : IRepository<Usuario>
     {
-        //Task<IEnumerable<Usuario>> Gets();
-        //Task<Usuario?> Get(Guid id);
-        //Task Insert(Usuario item);
-        //Task<bool> Update(Usuario item);
-        //Task<bool> Delete(Guid id);
-
         Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default);
 
         Task DeleteTmpByUpdaterUserIDAsync(Guid id);
@@ -17,5 +11,13 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
         Task<bool> IsUserValid(Guid id);
 
         Task<Usuario?> LoginAsync(string username, string password);
+
+        //Task<bool> AddGrupo(Grupo item);
+
+        //Task<bool> AddDerecho(Derecho item);
+
+        //Task<bool> RemoveGrupo(Grupo item);
+
+        //Task<bool> RemoveDerecho(Derecho item);
     }
 }

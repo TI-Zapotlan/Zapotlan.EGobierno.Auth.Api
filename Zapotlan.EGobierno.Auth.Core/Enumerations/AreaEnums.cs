@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zapotlan.EGobierno.Auth.Core.Enumerations
 {
-    public enum AreaTipo
+    public enum AreaType
     {
         Ninguno,
         Presidencia,
@@ -20,7 +20,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Enumerations
         Sub_Jefatura
     }
 
-    public enum AreaEstatusTipo
+    public enum AreaEstatusType
     { 
         Ninguno,
         Activo,
@@ -28,7 +28,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Enumerations
         Eliminado
     }
 
-    public enum AreaOrdenFilterTipo
+    public enum AreaOrderFilterType
     { 
         Ninguno,
         Clave,

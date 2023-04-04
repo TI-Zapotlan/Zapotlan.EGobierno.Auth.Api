@@ -29,8 +29,9 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         {
             _usuarioServices = usuarioService;
             _mapper = mapper;
-            _usuariosMapping = new UsuariosMapping(mapper);
             _uriService = uriService;
+
+            _usuariosMapping = new UsuariosMapping(mapper);
         }
 
         /// <summary>
@@ -111,7 +112,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             var item = new Usuario
             {
                 ID = Guid.NewGuid(),
-                Estatus = UsuarioEstatusTipo.Ninguno,
+                Estatus = UsuarioEstatusType.Ninguno,
                 FechaAlta = DateTime.Now,
                 FechaActualizacion = DateTime.Now,
                 UsuarioActualizacionID = itemDto.UsuarioActualizacionID
@@ -132,7 +133,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         {
             if (id != itemDto.ID)
             {   
-                throw new BusinessException("El identificador no coincide con el identificador de la ruta.");
+                throw new BusinessException("El id no coincide con el identificador de la ruta.");
             }
 
             var item = _mapper.Map<Usuario>(itemDto);

@@ -28,6 +28,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
                 .HasColumnName("IdUsuarioActualizacion")
                 .IsRequired();
 
+            // RELATIONS
+
             builder.HasOne(e => e.UsuarioActualizacion)
                 .WithMany()
                 .HasForeignKey("UsuarioActualizacionID");

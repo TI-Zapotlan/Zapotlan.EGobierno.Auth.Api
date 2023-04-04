@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zapotlan.EGobierno.Auth.Core.Enumerations
 {
-    public enum PersonaEstadoVidaTipo
+    public enum PersonaEstadoVidaType
     {
         Ninguno,
         Vivo,
@@ -14,7 +14,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Enumerations
         Desconocido
     }
 
-    public enum PersonaOrdenFilterTipo
+    public enum PersonaOrderFilterType
     { 
         Ninguno,
         Nombre,

@@ -23,11 +23,11 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
 
         public string? Descripcion { get; set; }
 
-        public AreaEstatusTipo Activo { get; set; }
+        public AreaEstatusType Activo { get; set; }
 
-        public AreaEstatusTipo? Estatus { get; set; }
+        public AreaEstatusType? Estatus { get; set; }
 
-        public AreaTipo Tipo { get; set; }
+        public AreaType Tipo { get; set; }
 
         public DateTime FechaAlta { get; set; }
 

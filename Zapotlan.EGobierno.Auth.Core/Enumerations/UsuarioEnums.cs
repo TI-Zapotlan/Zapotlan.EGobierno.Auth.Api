@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zapotlan.EGobierno.Auth.Core.Enumerations
 {
-    public enum UsuarioEstatusTipo
+    public enum UsuarioEstatusType
     {
         Ninguno,
         Activo,
@@ -14,7 +14,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Enumerations
         Eliminado
     }
 
-    public enum UsuarioRolTipo
+    public enum UsuarioRolType
     {
         Ninguno,
         Presidente,
@@ -27,7 +27,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Enumerations
         Secretario
     }
 
-    public enum UsuarioOrdenFilterTipo
+    public enum UsuarioOrderFilterType
     { 
         Ninguno,
         Username,

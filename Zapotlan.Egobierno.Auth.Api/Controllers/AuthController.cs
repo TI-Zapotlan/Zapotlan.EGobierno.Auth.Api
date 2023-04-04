@@ -6,18 +6,19 @@ using System.Security.Claims;
 using System.Text;
 using Zapotlan.EGobierno.Auth.Core.DTOs;
 using Zapotlan.EGobierno.Auth.Core.Entities;
+using Zapotlan.EGobierno.Auth.Core.Enumerations;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TokenController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IUsuarioService _usuarioServices;
         private readonly IConfiguration _configuration;
 
-        public TokenController(IUsuarioService usuarioService, IConfiguration configuration)
+        public AuthController(IUsuarioService usuarioService, IConfiguration configuration)
         {
             _usuarioServices = usuarioService;
             _configuration = configuration;
@@ -45,12 +46,12 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
             var header = new JwtHeader(signingCredentials);
 
-            // Generating token claims
+            // Generating token claim
             var claims = new[]
             {
                 new Claim("idx", item.ID.ToString()),
-                new Claim("usr", item.Username ?? "(null)")
-                //new Claim(ClaimTypes.Role, "Admin")
+                new Claim("username", item.Username ?? "(null)"),
+                new Claim(ClaimTypes.Role, RoleType.Administrator.ToString())
             };
 
             // Generating token payload

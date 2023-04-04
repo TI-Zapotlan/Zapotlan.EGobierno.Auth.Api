@@ -36,7 +36,14 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
                 .HasColumnName("IdUsuarioActualizacion")
                 .IsRequired();
 
-            builder.Ignore(e => e.UsuarioActualizacion);
+            builder.Ignore(e => e.ID);
+            //builder.Ignore(e => e.UsuarioActualizacion);
+
+            // RELATIONS
+
+            builder.HasOne(e => e.UsuarioActualizacion)
+                .WithMany()
+                .HasForeignKey("UsuarioActualizacionID");
         }
     }
 }

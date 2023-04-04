@@ -21,7 +21,7 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
 
         public string? CURP { get; set; }
 
-        public PersonaEstadoVidaTipo EstadoVida { get; set; }
+        public PersonaEstadoVidaType EstadoVida { get; set; }
 
         public Guid UsuarioActualizacionID { get; set; }
 
@@ -38,7 +38,7 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
 
         public string? CURP { get; set; }
 
-        public PersonaEstadoVidaTipo EstadoVida { get; set; }
+        public PersonaEstadoVidaType EstadoVida { get; set; }
 
         public string? UsuarioActualizacionNombre {get; set;}
 
@@ -59,7 +59,7 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
 
         public string? CURP { get; set; }
 
-        public PersonaEstadoVidaTipo EstadoVida { get; set; }
+        public PersonaEstadoVidaType EstadoVida { get; set; }
 
         public string? UsuarioActualizacionNombre { get; set; }
 

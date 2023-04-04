@@ -15,11 +15,11 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
 
         public string? Descripcion { get; set; }
 
-        public DerechoAccesoTipo Acceso { get; set; }
+        public DerechoAccesoType Acceso { get; set; }
 
-        public Guid UsuarioActualizacionID { get; set; }
+        public Guid? UsuarioActualizacionID { get; set; }
 
-        public DateTime FechaActualizacion { get; set; }
+        public DateTime? FechaActualizacion { get; set; }
     }
 
     public class DerechoListDto
@@ -30,10 +30,10 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
 
         public string? Descripcion { get; set; }
 
-        public DerechoAccesoTipo Acceso { get; set; }
+        public DerechoAccesoType Acceso { get; set; }
 
         public string? NombreUsuarioActualizacion { get; set; }
 
-        public DateTime FechaActualizacion { get; set; }
+        public DateTime? FechaActualizacion { get; set; }
     }
 }

@@ -40,7 +40,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
                 items = items.Where(a => a.Nombre != null && a.Nombre.ToLower().Contains(filters.Nombre.ToLower()));
             }
 
-            if (filters.Activo != null && filters.Activo != Enumerations.AreaEstatusTipo.Ninguno)
+            if (filters.Activo != null && filters.Activo != AreaEstatusType.Ninguno)
             {
                 items = items.Where(a => a.Activo == filters.Activo);
             }
@@ -49,22 +49,22 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
             switch (filters.Orden)
             {
-                case AreaOrdenFilterTipo.Clave:
+                case AreaOrderFilterType.Clave:
                     items = items.OrderBy(a => a.Clave);
                     break;
-                case AreaOrdenFilterTipo.Nombre:
+                case AreaOrderFilterType.Nombre:
                     items = items.OrderBy(a => a.Nombre);
                     break;
-                case AreaOrdenFilterTipo.FechaActualizacion:
+                case AreaOrderFilterType.FechaActualizacion:
                     items = items.OrderBy(a => a.FechaActualizacion);
                     break;
-                case AreaOrdenFilterTipo.ClaveDesc:
+                case AreaOrderFilterType.ClaveDesc:
                     items = items.OrderByDescending(a => a.Clave);
                     break;
-                case AreaOrdenFilterTipo.NombreDesc:
+                case AreaOrderFilterType.NombreDesc:
                     items = items.OrderByDescending(a => a.Nombre);
                     break;
-                case AreaOrdenFilterTipo.FechaActualizacionDesc:
+                case AreaOrderFilterType.FechaActualizacionDesc:
                     items = items.OrderByDescending(a => a.FechaActualizacion);
                     break;
                 default:

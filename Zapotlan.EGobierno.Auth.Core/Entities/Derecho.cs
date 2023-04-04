@@ -14,11 +14,11 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? Descripcion { get; set; }
 
-        public DerechoAccesoTipo Acceso { get; set; }
+        public DerechoAccesoType Acceso { get; set; }
 
         // RELATIONS
 
-        [ForeignKey("UsuarioActualizacionID")]
+        // [ForeignKey("UsuarioActualizacionID")]
         public virtual Usuario? UsuarioActualizacion { get; set; }
 
         public virtual ICollection<Usuario>? Usuarios { get; set; }

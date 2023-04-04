@@ -7,11 +7,13 @@ using Zapotlan.EGobierno.Auth.Core.Enumerations;
 
 namespace Zapotlan.EGobierno.Auth.Core.QueryFilters
 {
-    public class PersonaQueryFilter : DefaultQueryFilter
+    public class GrupoQueryFilter : DefaultQueryFilter
     {
+        public Guid? UsuarioID { get; set; }
+        public int? DerechoID { get; set; }
+        public Guid? UsuarioActualizacionID { get; set; }
         public string? Texto { get; set; }
-        public PersonaEstadoVidaType? EstadoVida { get; set; } = PersonaEstadoVidaType.Ninguno;
 
-        public PersonaOrderFilterType? Orden { get; set; } = PersonaOrderFilterType.Ninguno; 
+        public GrupoOrderFilterType? Orden { get; set; }
     }
 }

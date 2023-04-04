@@ -11,14 +11,16 @@ namespace Zapotlan.EGobierno.Auth.Core.QueryFilters
     {
         public Guid? AreaID { get; set; }
         public Guid? UsuarioActualizacionID { get; set; }
+        public Guid? GrupoID { get; set; }
+        public int? DerechoID { get; set; }
         public string? Codigo { get; set; }
         public string? Username { get; set; }
         public string? Nombre { get; set;}
-        public UsuarioEstatusTipo? Estatus { get; set; } = UsuarioEstatusTipo.Ninguno;
-        public UsuarioRolTipo? Rol { get; set; } = UsuarioRolTipo.Ninguno;
+        public UsuarioEstatusType? Estatus { get; set; } = UsuarioEstatusType.Ninguno;
+        public UsuarioRolType? Rol { get; set; } = UsuarioRolType.Ninguno;
 
         public bool? IncluirSubAreas { get; set; }
 
-        public UsuarioOrdenFilterTipo? Orden { get; set; } = UsuarioOrdenFilterTipo.Ninguno;
+        public UsuarioOrderFilterType? Orden { get; set; } = UsuarioOrderFilterType.Ninguno;
     }
 }

@@ -6,8 +6,8 @@ namespace Zapotlan.EGobierno.Auth.Core.QueryFilters
     {
         public Guid? AreaPadreID { get; set; }
         public string? Nombre { get; set; } = string.Empty;
-        public AreaEstatusTipo? Activo { get; set; }
+        public AreaEstatusType? Activo { get; set; }
 
-        public AreaOrdenFilterTipo? Orden { get; set; } = AreaOrdenFilterTipo.Ninguno;
+        public AreaOrderFilterType? Orden { get; set; } = AreaOrderFilterType.Ninguno;
     }
 }

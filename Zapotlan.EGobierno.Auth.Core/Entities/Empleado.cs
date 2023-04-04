@@ -1,4 +1,6 @@
-﻿namespace Zapotlan.EGobierno.Auth.Core.Entities
+﻿using Zapotlan.EGobierno.Auth.Core.Enumerations;
+
+namespace Zapotlan.EGobierno.Auth.Core.Entities
 {
     public class Empleado : BaseEntity
     {
@@ -26,7 +28,7 @@
 
         public DateTime FechaAlta { get; set; }
 
-        public int Estatus { get; set; }
+        public EmpleadoEstatusType Estatus { get; set; }
 
         // RELATIONS
 

@@ -85,9 +85,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
                         ID = derecho.DerechoID,
                         Nombre = derecho.Nombre,
                         Descripcion = derecho.Descripcion,
-                        Acceso = derecho.Acceso,
-                        NombreUsuarioActualizacion = derecho.UsuarioActualizacion != null ? derecho.UsuarioActualizacion.Username : string.Empty,
-                        FechaActualizacion = derecho.FechaActualizacion
+                        Acceso = derecho.Acceso
                     });
                 }
             }
@@ -102,9 +100,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
                     {
                         ID = grupo.ID,
                         Nombre = grupo.Nombre,
-                        Descripcion = grupo.Descripcion,
-                        NombreUsuarioActualizacion = grupo.UsuarioActualizacion != null ? grupo.UsuarioActualizacion.Username : string.Empty,
-                        FechaActualizacion = grupo.FechaActualizacion
+                        Descripcion = grupo.Descripcion
                     });
                 }
             }

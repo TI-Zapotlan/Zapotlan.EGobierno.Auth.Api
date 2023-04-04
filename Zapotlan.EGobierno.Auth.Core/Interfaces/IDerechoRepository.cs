@@ -7,9 +7,10 @@ using Zapotlan.EGobierno.Auth.Core.Entities;
 
 namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
-    public interface IDerechoRepository
+    public interface IDerechoRepository : IRepository<Derecho>
     {
-        Task<IEnumerable<Derecho>> Gets();
-        Task<Derecho> Get(Guid id);
+        Task<bool> ExistNameAsync(string name, int exceptionID = default);
+
+        Task<bool> ExistIDAsync(int id);
     }
 }
