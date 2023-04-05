@@ -45,6 +45,7 @@ builder.Services.AddDbContext<DataCenterContext>(options =>
     options.UseSqlServer(dataCenterConnection));
 
 builder.Services.AddTransient<IAreaService, AreaService>();
+builder.Services.AddTransient<IDerechoService, DerechoService>();
 builder.Services.AddTransient<IGrupoService, GrupoService>();
 builder.Services.AddTransient<IPersonaService, PersonaService>();
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();

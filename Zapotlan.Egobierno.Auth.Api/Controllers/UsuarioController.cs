@@ -156,5 +156,15 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("{id}/add-derecho")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
+        public async Task<IActionResult> PostAddDerecho(Guid id, int derechoId)
+        {
+            var itemAdded = await _usuarioServices.AddDerechoAsync(id, derechoId);
+            var response = new ApiResponse<bool>(itemAdded);
+
+            return Ok(response);
+        }
     }
 }

@@ -31,7 +31,8 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
     {
         public string NombreUsuarioActualizacion { get; set; } = string.Empty;
         public virtual ICollection<UsuarioListDto>? Usuarios { get; set; }
-        public virtual ICollection<DerechoListDto>? Derechos { get; set; }    }
+        public virtual ICollection<DerechoListDto>? Derechos { get; set; }   
+    }
 
     public class GrupoInsertDto
     {

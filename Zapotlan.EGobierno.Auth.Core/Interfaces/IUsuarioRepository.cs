@@ -12,9 +12,11 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 
         Task<Usuario?> LoginAsync(string username, string password);
 
+        Task<bool> HasPermisionAsync(Guid id, int derechoID);
+
         //Task<bool> AddGrupo(Grupo item);
 
-        //Task<bool> AddDerecho(Derecho item);
+        Task<bool> AddDerechoAsync(Guid id, Derecho item);
 
         //Task<bool> RemoveGrupo(Grupo item);
 

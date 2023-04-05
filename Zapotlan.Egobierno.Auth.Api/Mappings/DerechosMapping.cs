@@ -4,23 +4,26 @@ using Zapotlan.EGobierno.Auth.Core.Entities;
 
 namespace Zapotlan.EGobierno.Auth.Api.Mappings
 {
-    public class GruposMapping
+    public class DerechosMapping
     {
         private readonly IMapper _mapper;
 
-        public GruposMapping(IMapper mapper)
+        // CONSTRUCTOR
+
+        public DerechosMapping(IMapper mapper)
         {
             _mapper = mapper;
         }
 
-        public IEnumerable<GrupoListDto> GrupoToListDto(IEnumerable<Grupo> items)
-        { 
-            var itemsDto = new List<GrupoListDto>();
+        // METHODS
 
+        public IEnumerable<DerechoListDto> DerechoToListDto(IEnumerable<Derecho> items)
+            {
+            var itemsDto = new List<DerechoListDto>();
+            
             foreach (var item in items)
             {
-                //var itemDto = new GrupoListDto();
-                var itemDto = _mapper.Map<GrupoListDto>(item);
+                var itemDto = _mapper.Map<DerechoListDto>(item);
 
                 if (item.UsuarioActualizacion != null)
                 {
@@ -32,9 +35,9 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
                     itemDto.UsuariosCount = item.Usuarios.Count;
                 }
 
-                if (item.Derechos != null)
+                if (item.Grupos != null)
                 {
-                    itemDto.DerechosCount = item.Derechos.Count;
+                    itemDto.GruposCount = item.Grupos.Count;
                 }
 
                 itemsDto.Add(itemDto);
@@ -43,25 +46,26 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
             return itemsDto;
         }
 
-        public GrupoDetailsDto GrupoToDetailDto(Grupo item)
-        { 
-            var itemDto = _mapper.Map<GrupoDetailsDto>(item);
+        public DerechoDetailsDto DerechoToDetailDto(Derecho item)
+        {
+            var itemDto = _mapper.Map<DerechoDetailsDto>(item);
 
-            if (item.UsuarioActualizacion != null) {
+            if (item.UsuarioActualizacion != null)
+            {
                 itemDto.NombreUsuarioActualizacion = item.UsuarioActualizacion.Username ?? String.Empty;
             }
 
-            if (item.Derechos != null)
+            if (item.Grupos != null)
             {
-                itemDto.Derechos = new List<DerechoListDto>();
+                itemDto.Grupos = new List<GrupoListDto>();
 
-                foreach (var derecho in item.Derechos)
+                foreach (var grupo in item.Grupos)
                 {
-                    itemDto.Derechos.Add(new DerechoListDto {
-                        DerechoID = derecho.DerechoID,
-                        Nombre = derecho.Nombre,
-                        Descripcion = derecho.Descripcion,
-                        Acceso = derecho.Acceso
+                    itemDto.Grupos.Add(new GrupoListDto
+                    {
+                        ID = grupo.ID,
+                        Nombre = grupo.Nombre,
+                        Descripcion = grupo.Descripcion
                     });
                 }
             }
@@ -72,7 +76,8 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
 
                 foreach (var usuario in item.Usuarios)
                 {
-                    itemDto.Usuarios.Add(new UsuarioListDto { 
+                    itemDto.Usuarios.Add(new UsuarioListDto
+                    {
                         ID = usuario.ID,
                         Username = usuario.Username,
                         Correo = usuario.Correo,

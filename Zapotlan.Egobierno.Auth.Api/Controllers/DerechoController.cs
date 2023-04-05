@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Zapotlan.EGobierno.Auth.Api.Mappings;
@@ -9,37 +10,38 @@ using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Exceptions;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 using Zapotlan.EGobierno.Auth.Core.QueryFilters;
+using Zapotlan.EGobierno.Auth.Core.Services;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GrupoController : ControllerBase
+    public class DerechoController : ControllerBase
     {
-        private readonly IGrupoService _grupoService;
+        private readonly IDerechoService _derechoService;
         private readonly IMapper _mapper;
-        private readonly GruposMapping _gruposMapping;
+        private readonly DerechosMapping _derechosMapping;
 
         // CONSTRUCTOR
 
-        public GrupoController(IGrupoService grupoService, IMapper mapper)
+        public DerechoController(IDerechoService derechoService, IMapper mapper)
         {
-            _grupoService = grupoService;
+            _derechoService = derechoService;
             _mapper = mapper;
 
-            _gruposMapping = new GruposMapping(_mapper);
+            _derechosMapping = new DerechosMapping(_mapper);
         }
 
         // ENDPOINTS
 
         [Produces("application/json")]
-        [HttpGet(Name = nameof(GetGrupos))]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<GrupoListDto>>))]
+        [HttpGet(Name = nameof(GetDerechos))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<DerechoListDto>>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult GetGrupos([FromQuery] GrupoQueryFilter filters)
+        public IActionResult GetDerechos([FromQuery] DerechoQueryFilter filters)
         {
-            var items = _grupoService.Gets(filters);
-            var itemsDto = _gruposMapping.GrupoToListDto(items);
+            var items = _derechoService.Gets(filters);
+            var itemsDto = _derechosMapping.DerechoToListDto(items);
             var metadata = new Metadata
             {
                 TotalCount = items.TotalCount,
@@ -50,7 +52,8 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
                 HasPreviousPage = items.HasPreviousPage,
             };
 
-            var response = new ApiResponse<IEnumerable<GrupoListDto>>(itemsDto) {
+            var response = new ApiResponse<IEnumerable<DerechoListDto>>(itemsDto)
+            {
                 Meta = metadata
             };
 
@@ -59,63 +62,64 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
 
         [Produces("application/json")]
         [HttpGet("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<GrupoDto>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<DerechoDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetGrupo(Guid id)
+        public async Task<IActionResult> GetDerecho(int id)
         {
-            var item = await _grupoService.GetAsync(id);
+            var item = await _derechoService.GetAsync(id);
 
             if (item == null)
             {
                 throw new BusinessException($"No se encontró un elemento con el Id: {id}");
             }
 
-            var itemDto = _gruposMapping.GrupoToDetailDto(item);
-            var response = new ApiResponse<GrupoDetailsDto>(itemDto);
-            
+            var itemDto = _derechosMapping.DerechoToDetailDto(item);
+            var response = new ApiResponse<DerechoDetailsDto>(itemDto);
+
             return Ok(response);
         }
 
         [Produces("application/json")]
         [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<GrupoDto>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<DerechoDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> PostGrupo(GrupoInsertDto itemDto)
+        public async Task<IActionResult> PostDerecho(DerechoInsertDto itemDto)
         {
-            var item = new Grupo
+            var item = new Derecho
             {
-                ID = Guid.NewGuid(),
+                DerechoID = itemDto.DerechoID,
                 Nombre = itemDto.Nombre,
                 Descripcion = itemDto.Descripcion,
+                Acceso = itemDto.Acceso,
                 FechaActualizacion = DateTime.Now,
                 UsuarioActualizacionID = itemDto.UsuarioActualizacionID
             };
 
-            var newItem = await _grupoService.AddAsync(item);
-            var itemReturnDto = _mapper.Map<GrupoDto>(newItem);
-            var response = new ApiResponse<GrupoDto>(itemReturnDto);
+            var newItem = await _derechoService.AddAsync(item);
+            var itemReturnDto = _mapper.Map<DerechoDto>(newItem);
+            var response = new ApiResponse<DerechoDto>(itemReturnDto);
 
             return Ok(response);
         }
 
         [Produces("application/json")]
         [HttpPut("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<GrupoDto>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<DerechoDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> PutUsuario(Guid id, GrupoUpdateDto itemDto)
+        public async Task<IActionResult> PutUsuario(int id, DerechoUpdateDto itemDto)
         {
-            if (id != itemDto.ID)
+            if (id != itemDto.DerechoID)
             {
                 throw new BusinessException("El id no coincide con el identificador de la ruta");
             }
 
-            var item = _mapper.Map<Grupo>(itemDto);
-            item.ID = id;
+            var item = _mapper.Map<Derecho>(itemDto);
+            item.DerechoID = id;
             item.FechaActualizacion = DateTime.Now;
 
-            var updatedItem = await _grupoService.UpdateAsync(item);
-            var itemReturnDto = _mapper.Map<GrupoDto>(updatedItem);
-            var response = new ApiResponse<GrupoDto>(itemReturnDto);
+            var updatedItem = await _derechoService.UpdateAsync(item);
+            var itemReturnDto = _mapper.Map<DerechoDto>(updatedItem);
+            var response = new ApiResponse<DerechoDto>(itemReturnDto);
 
             return Ok(response);
         }
@@ -124,12 +128,13 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> DeleteGrupo(Guid id)
+        public async Task<IActionResult> DeleteDerecho(int id)
         {
-            var result = await _grupoService.DeleteAsync(id);
+            var result = await _derechoService.DeleteAsync(id);
             var response = new ApiResponse<bool>(result);
 
             return Ok(response);
         }
+
     }
 }

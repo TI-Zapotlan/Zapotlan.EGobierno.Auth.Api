@@ -72,15 +72,6 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             }
         }
 
-        //public override async Task DeleteAsync(Guid id)
-        //{
-        //    var currentItem = await GetAsync(id);
-        //    if (currentItem != null)
-        //    {
-        //        _entity.Remove(currentItem);
-        //    }
-        //}
-
         // default(Guid) es la forma de decirle que va a recibir un Guid.Empty - ver: https://stackoverflow.com/questions/5117970/how-can-i-default-a-parameter-to-guid-empty-in-c
         public async Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default(Guid))
         {
@@ -111,7 +102,9 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             var user = await _entity.FindAsync(id);
             if (user != null)
             {
-                // HACK: Aqui valtan más validaciones
+                // HACK: Aqui valtan más validaciones como:
+                // - El empleado esta activo
+                // - La persona no ha fallecido
 
                 if (user.Estatus == UsuarioEstatusType.Activo)
                 {
@@ -126,11 +119,86 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         {
             var encryptedPwd = GetMD5Hash(password);
             var user = await _entity
+                .Include(e => e.Derechos)
+                .Include(e => e.Grupos)
+                    .ThenInclude(g => g.Derechos)
                 .Where(u => u.Username == username && u.Password == encryptedPwd)
                 .FirstOrDefaultAsync();
 
             return user;
         }
+
+        public async Task<bool> HasPermisionAsync(Guid id, int derechoID)
+        {
+            bool hasPermision = false;
+
+            var user = await _entity
+                .Include(e => e.Derechos)
+                .Include(e => e.Grupos)
+                    .ThenInclude(g => g.Derechos)
+                .Where(e => e.ID == id).FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                if (user.Derechos != null)
+                { 
+                    var tieneDerecho = user.Derechos.Where(d => d.DerechoID == derechoID).Any();
+                    if (tieneDerecho) return true;
+                }
+
+                if (user.Grupos != null)
+                {
+                    foreach (var grupo in user.Grupos)
+                    {
+                        if (grupo.Derechos != null)
+                        {
+                            var tieneDerecho = grupo.Derechos.Where(d => d.DerechoID == derechoID).Any();
+                            if (tieneDerecho) return true;
+                        }
+                    }
+                }
+            }
+            
+            //var hasPermision = await _entity
+            //    .Include(e => e.Derechos)
+            //    .Include(e => e.Grupos)
+            //        .ThenInclude(g => g.Derechos)
+            //    .Where(e => e.ID == id
+            //        && 
+            //        ((
+            //            e.Derechos != null 
+            //            && e.Derechos.Where(d => d.DerechoID == derechoID).Any()
+            //        )
+            //        || 
+            //        (
+            //            e.Grupos != null
+            //            && e.Grupos.Where(g => g.Derechos != null 
+            //                && g.Derechos.Where(d => d.DerechoID == derechoID).Any())
+            //            .Any()
+            //        ))
+            //    ).AnyAsync();
+            //return hasPermision;
+
+            return false;
+        }
+
+        public async Task<bool> AddDerechoAsync(Guid id, Derecho item)
+        {
+            var user = await _entity
+                .Include(e => e.Derechos)
+                .Where(e => e.ID == id)
+                .FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                if (user.Derechos == null) { user.Derechos = new List<Derecho>(); }
+                user.Derechos.Add(item);
+            }
+
+            return true;
+        }
+
+        // PRIVATE METHODS
 
         private string GetMD5Hash(string value)
         {

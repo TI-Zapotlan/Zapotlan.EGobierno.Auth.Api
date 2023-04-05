@@ -134,14 +134,42 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             return item;
         }
 
-        public Task<Derecho> UpdateAsync(Derecho item)
+        public async Task<Derecho> UpdateAsync(Derecho item)
         {
-            throw new NotImplementedException();
+            if (item.UsuarioActualizacionID == Guid.Empty)
+            {
+                throw new BusinessException("Faltó especificar el identificador del usuario que ejecuta la aplicación");
+            }
+
+            if (string.IsNullOrEmpty(item.Nombre))
+            {
+                throw new BusinessException("Faltó especificar el nombre del Derecho");
+            }
+
+            if (item.Acceso == DerechoAccesoType.Ninguno)
+            {
+                throw new BusinessException("Faltó especificar el tipo de acceso al Derecho");
+            }
+
+            if (await _unitOfWork.DerechoRepository.ExistNameAsync(item.Nombre, item.DerechoID))
+            {
+                throw new BusinessException("El nombre ya existe.");
+            }
+
+            await _unitOfWork.DerechoRepository.UpdateAsync(item);
+            await _unitOfWork.SaveChangesAsync();
+
+            return item;
         }
 
-        public Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            // Validaciones
+
+            await _unitOfWork.DerechoRepository.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
         }
     }
 }

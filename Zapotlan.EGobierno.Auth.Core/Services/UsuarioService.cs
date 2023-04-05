@@ -177,6 +177,23 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             return true;
         }
 
+        public async Task<bool> AddDerechoAsync(Guid id, int derechoID)
+        {
+            var derecho = await _unitOfWork.DerechoRepository.GetAsync(derechoID);
+
+            if (derecho != null)
+            { 
+                await _unitOfWork.UsuarioRepository.AddDerechoAsync(id, derecho);
+                await _unitOfWork.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        // USER AUTH
+
         public async Task<Usuario?> LoginAsync(string username, string password)
         {   
             var user = await _unitOfWork.UsuarioRepository.LoginAsync(username, password);
@@ -196,9 +213,7 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
         public async Task<bool> HasPermisionAsync(Guid id, int derecho)
         {
-
-
-            return false;
+            return await _unitOfWork.UsuarioRepository.HasPermisionAsync(id, derecho);
         }
 
     }

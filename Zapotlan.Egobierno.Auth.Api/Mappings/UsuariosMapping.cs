@@ -82,7 +82,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Mappings
                 {
                     itemDto.Derechos.Add(new DerechoListDto
                     {
-                        ID = derecho.DerechoID,
+                        DerechoID = derecho.DerechoID,
                         Nombre = derecho.Nombre,
                         Descripcion = derecho.Descripcion,
                         Acceso = derecho.Acceso

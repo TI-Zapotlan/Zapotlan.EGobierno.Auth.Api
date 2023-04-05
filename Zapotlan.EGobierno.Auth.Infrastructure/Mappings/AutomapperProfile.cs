@@ -18,7 +18,14 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Mappings
             CreateMap<AreaDto, Area>();
 
             // Derechos
+            CreateMap<Derecho, DerechoDto>().ReverseMap();
             CreateMap<Derecho, DerechoListDto>().ReverseMap();
+            CreateMap<Derecho, DerechoDetailsDto>()
+                .ForMember(dto => dto.Usuarios, o => o.Ignore())
+                .ForMember(dto => dto.Grupos, o => o.Ignore());
+            CreateMap<DerechoDetailsDto, Derecho>();
+            CreateMap<Derecho, DerechoInsertDto>().ReverseMap();
+            CreateMap<Derecho, DerechoUpdateDto>().ReverseMap();
 
             // Grupos
             CreateMap<Grupo, GrupoDto>().ReverseMap();

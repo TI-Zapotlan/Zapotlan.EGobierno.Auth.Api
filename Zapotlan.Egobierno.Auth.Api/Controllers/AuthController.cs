@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
+using Zapotlan.EGobierno.Auth.Api.Responses;
 using Zapotlan.EGobierno.Auth.Core.DTOs;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Enumerations;
@@ -18,11 +20,15 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         private readonly IUsuarioService _usuarioServices;
         private readonly IConfiguration _configuration;
 
+        // CONSTRUCTOR 
+
         public AuthController(IUsuarioService usuarioService, IConfiguration configuration)
         {
             _usuarioServices = usuarioService;
             _configuration = configuration;
         }
+
+        // ENDPOINTS
 
         [HttpPost]
         public async Task<IActionResult> Autentication(UsuarioLoginDto login)
@@ -33,11 +39,27 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             if (usuario != null)
             {
                 var token = GenerateToken(usuario);
+                // var response = new ApiResponse<string>(token);
+
                 return Ok(new { token });
+                //return Ok(response);
             }
 
             return NotFound();
         }
+
+        [HttpPost("has-permision")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
+        public async Task<IActionResult> HasPermision(UsuarioHasPermisionDto values)
+        {
+            var hasPermision = await _usuarioServices.HasPermisionAsync(values.UsuarioID, values.DerechoID);
+            var response = new ApiResponse<bool>(hasPermision);
+
+            return Ok(response);
+        }
+
+        // PRIVATE METHODS
 
         private string GenerateToken(Usuario item)
         {
@@ -67,5 +89,6 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }
