@@ -11,7 +11,7 @@ using Zapotlan.EGobierno.Auth.Infrastructure.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PersonaController : ControllerBase
     {

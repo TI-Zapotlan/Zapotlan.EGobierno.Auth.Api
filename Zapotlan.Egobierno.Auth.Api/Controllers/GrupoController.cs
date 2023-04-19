@@ -12,7 +12,7 @@ using Zapotlan.EGobierno.Auth.Core.QueryFilters;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class GrupoController : ControllerBase
     {
@@ -128,6 +128,26 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         {
             var result = await _grupoService.DeleteAsync(id);
             var response = new ApiResponse<bool>(result);
+
+            return Ok(response);
+        }
+
+        [HttpPost("{id}/add-derecho")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
+        public async Task<IActionResult> PostAddDerecho(Guid id, [FromBody] DerechoIDDto derecho)
+        { 
+            var itemAdded = await _grupoService.AddDerechoAsync(id, derecho.DerechoID);
+            var response = new ApiResponse<bool>(itemAdded);
+
+            return Ok(response);
+        }
+
+        [HttpPost("{id}/add-usuario")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
+        public async Task<IActionResult> PostAddUsuario(Guid id, [FromBody] UsuarioIDDto usuario)
+        {
+            var itemAdded = await _grupoService.AddUsuarioAsync(id, usuario.UsuarioID);
+            var response = new ApiResponse<bool>(itemAdded);
 
             return Ok(response);
         }

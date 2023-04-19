@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Zapotlan.EGobierno.Auth.Api.Mappings;
@@ -15,8 +16,8 @@ using Zapotlan.EGobierno.Auth.Infrastructure.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
+    //[Authorize]
+    [Route("[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase
     {
@@ -78,7 +79,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         /// <summary>
         /// Obtiene un registro detallado de un Usuario de acuerdo al identificador recibido.
         /// </summary>
-        /// <param name="id">Identificadorl de usuario a devolver</param>
+        /// <param name="id">Identificador del usuario a devolver</param>
         /// <returns></returns>
         [Produces("application/json")]
         [HttpGet("{id}")]
@@ -159,9 +160,19 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
 
         [HttpPost("{id}/add-derecho")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
-        public async Task<IActionResult> PostAddDerecho(Guid id, int derechoId)
+        public async Task<IActionResult> PostAddDerecho(Guid id, [FromBody] DerechoIDDto derecho)
         {
-            var itemAdded = await _usuarioServices.AddDerechoAsync(id, derechoId);
+            var itemAdded = await _usuarioServices.AddDerechoAsync(id, derecho.DerechoID);
+            var response = new ApiResponse<bool>(itemAdded);
+
+            return Ok(response);
+        }
+
+        [HttpPost("{id}/add-grupo")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<bool>))]
+        public async Task<IActionResult> PostAddGrupo(Guid id, [FromBody] GrupoIDDto grupo)
+        {
+            var itemAdded = await _usuarioServices.AddGrupoAsync(id, grupo.GrupoID);
             var response = new ApiResponse<bool>(itemAdded);
 
             return Ok(response);

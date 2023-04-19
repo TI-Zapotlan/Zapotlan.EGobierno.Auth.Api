@@ -12,7 +12,7 @@ using Zapotlan.EGobierno.Auth.Core.QueryFilters;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AreaController : ControllerBase
     {

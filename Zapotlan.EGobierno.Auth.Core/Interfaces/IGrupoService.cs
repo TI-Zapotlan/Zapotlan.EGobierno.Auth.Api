@@ -20,5 +20,9 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
         Task<Grupo> UpdateAsync(Grupo item);
 
         Task<bool> DeleteAsync(Guid id);
+
+        Task<bool> AddDerechoAsync(Guid id, int derechoID);
+
+        Task<bool> AddUsuarioAsync(Guid id, Guid usuarioID);
     }
 }

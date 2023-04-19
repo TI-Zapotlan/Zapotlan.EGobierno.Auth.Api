@@ -39,6 +39,11 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Grupo?> GetSingleAsync(Guid id)
+        { 
+            return await _entity.FindAsync(id);
+        }
+
         public async Task UpdateAsync(Grupo item)
         { 
             var currentItem = await _entity.FindAsync(item.ID);
@@ -68,6 +73,32 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 .CountAsync();
 
             return total > 0;
+        }
+
+        public async Task AddDerechoAsync(Guid id, Derecho item)
+        {
+            var grupo = await _entity
+                .Include(e => e.Derechos)
+                .Where(e => e.ID == id)
+                .FirstOrDefaultAsync();
+
+            if (grupo != null)
+            {
+                (grupo.Derechos ??= new List<Derecho>()).Add(item); // Ver asignacion similar en UsuarioRepository                
+            }
+        }
+
+        public async Task AddUsuarioAsync(Guid id, Usuario item)
+        {
+            var grupo = await _entity
+                .Include(e => e.Usuarios)
+                .Where(e => e.ID == id)
+                .FirstOrDefaultAsync();
+
+            if (grupo != null)
+            {
+                (grupo.Usuarios ??= new List<Usuario>()).Add(item);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Enumerations;
@@ -129,6 +130,34 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             await _unitOfWork.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<bool> AddDerechoAsync(Guid id, int derechoID)
+        { 
+            var derecho = await _unitOfWork.DerechoRepository.GetSingleAsync(derechoID);
+
+            if (derecho != null)
+            { 
+                await _unitOfWork.GrupoRepository.AddDerechoAsync(id, derecho);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> AddUsuarioAsync(Guid id, Guid usuarioID)
+        {
+            var usuario = await _unitOfWork.UsuarioRepository.GetSingleAsync(usuarioID);
+
+            if (usuario != null)
+            {
+                await _unitOfWork.GrupoRepository.AddUsuarioAsync(id, usuario);
+                await _unitOfWork.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
         }
 
     }

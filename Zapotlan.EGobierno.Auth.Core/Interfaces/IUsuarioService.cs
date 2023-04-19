@@ -18,6 +18,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 
         Task<bool> AddDerechoAsync(Guid id, int derechoID);
 
+        Task<bool> AddGrupoAsync(Guid id, Guid grupoID);
+
         // AUTH
 
         Task<Usuario?> LoginAsync(string username, string password);

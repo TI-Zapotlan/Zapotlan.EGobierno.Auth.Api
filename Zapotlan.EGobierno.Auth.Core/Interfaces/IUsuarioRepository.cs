@@ -4,6 +4,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
     public interface IUsuarioRepository : IRepository<Usuario>
     {
+        Task<Usuario?> GetSingleAsync(Guid id);
+
         Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default);
 
         Task DeleteTmpByUpdaterUserIDAsync(Guid id);
@@ -14,9 +16,9 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 
         Task<bool> HasPermisionAsync(Guid id, int derechoID);
 
-        //Task<bool> AddGrupo(Grupo item);
+        Task AddDerechoAsync(Guid id, Derecho item);
 
-        Task<bool> AddDerechoAsync(Guid id, Derecho item);
+        Task AddGrupoAsync(Guid id, Grupo item);
 
         //Task<bool> RemoveGrupo(Grupo item);
 

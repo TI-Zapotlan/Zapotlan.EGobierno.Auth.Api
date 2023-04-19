@@ -13,7 +13,7 @@ using Zapotlan.EGobierno.Auth.Core.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -86,6 +86,12 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             );
 
             var token = new JwtSecurityToken(header, payload);
+
+            //var token = new JwtSecurityToken(
+            //    claims: claims,
+            //    expires: DateTime.Now.AddDays(1),
+            //    signingCredentials: signingCredentials
+            //    );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

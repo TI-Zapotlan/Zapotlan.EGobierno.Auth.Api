@@ -96,5 +96,8 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
         public int DerechoID { get; set; }
     }
 
-
+    public class UsuarioIDDto
+    {
+        public Guid UsuarioID { get; set; }
+    }
 }

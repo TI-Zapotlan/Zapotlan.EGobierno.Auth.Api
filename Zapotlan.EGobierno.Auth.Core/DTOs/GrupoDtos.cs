@@ -48,4 +48,9 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
         public string? Descripcion { get; set; }
         public Guid UsuarioActualizacionID { get; set; }
     }
+
+    public class GrupoIDDto
+    { 
+        public Guid GrupoID { get; set; }
+    }
 }

@@ -42,6 +42,11 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Usuario?> GetSingleAsync(Guid id)
+        {
+            return await _entity.FindAsync(id);
+        }
+
         //public override async Task AddAsync(Usuario item)
         //{   
         //    await _entity.AddAsync(item);
@@ -182,7 +187,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             return false;
         }
 
-        public async Task<bool> AddDerechoAsync(Guid id, Derecho item)
+        public async Task AddDerechoAsync(Guid id, Derecho item)
         {
             var user = await _entity
                 .Include(e => e.Derechos)
@@ -191,11 +196,33 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
 
             if (user != null)
             {
-                if (user.Derechos == null) { user.Derechos = new List<Derecho>(); }
-                user.Derechos.Add(item);
+                // if (user.Derechos == null) { user.Derechos = new List<Derecho>(); }
+                // user.Derechos.Add(item);
+                (user.Derechos ??= new List<Derecho>()).Add(item); // Esto es equivalente a las dos lineas anteriores
             }
+            else
+            {
+                throw new BusinessException("No se encontró el registro del Usuario");
+            }
+        }
 
-            return true;
+        public async Task AddGrupoAsync(Guid id, Grupo item)
+        { 
+            var user = await _entity
+                .Include(e => e.Grupos)
+                .Where(e => e.ID == id)
+                .FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                //if (user.Grupos == null) { user.Grupos = new List<Grupo>(); }
+                user.Grupos ??= new List<Grupo>(); // Esto es equivalente a la linea anterior
+                user.Grupos.Add(item);
+            }
+            else
+            {
+                throw new BusinessException("No se encontró el registro del Usuario");
+            }
         }
 
         // PRIVATE METHODS

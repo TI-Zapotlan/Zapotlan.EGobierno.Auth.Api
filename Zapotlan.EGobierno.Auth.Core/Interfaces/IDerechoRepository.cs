@@ -9,6 +9,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 {
     public interface IDerechoRepository : IRepository<Derecho>
     {
+        Task<Derecho?> GetSingleAsync(int id);
+
         Task<bool> ExistNameAsync(string name, int exceptionID = default);
 
         Task<bool> ExistIDAsync(int id);

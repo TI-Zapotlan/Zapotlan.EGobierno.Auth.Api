@@ -179,11 +179,26 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
         public async Task<bool> AddDerechoAsync(Guid id, int derechoID)
         {
-            var derecho = await _unitOfWork.DerechoRepository.GetAsync(derechoID);
+            var derecho = await _unitOfWork.DerechoRepository.GetSingleAsync(derechoID);
 
             if (derecho != null)
             { 
                 await _unitOfWork.UsuarioRepository.AddDerechoAsync(id, derecho);
+                await _unitOfWork.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> AddGrupoAsync(Guid id, Guid grupoID)
+        {
+            var grupo = await _unitOfWork.GrupoRepository.GetSingleAsync(grupoID);
+
+            if (grupo != null)
+            {
+                await _unitOfWork.UsuarioRepository.AddGrupoAsync(id, grupo); 
                 await _unitOfWork.SaveChangesAsync();
 
                 return true;

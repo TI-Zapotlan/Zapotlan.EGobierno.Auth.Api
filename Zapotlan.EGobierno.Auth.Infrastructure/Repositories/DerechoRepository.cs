@@ -39,6 +39,11 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Derecho?> GetSingleAsync(int id)
+        {
+            return await _entity.FindAsync(id);
+        }
+
         public async Task UpdateAsync(Derecho item)
         { 
             var currentItem = await _entity.FindAsync(item.DerechoID);
