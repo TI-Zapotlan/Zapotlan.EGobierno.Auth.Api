@@ -17,8 +17,21 @@ using Zapotlan.EGobierno.Auth.Infrastructure.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 var dataCenterConnection = builder.Configuration.GetConnectionString("DataCenterConnection");
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
+
+builder.Services.AddCors(o => {
+    o.AddPolicy(name: MyAllowSpecificOrigins,
+        policy => {
+            policy.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:5173"
+                )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddControllers(options => {
     options.Filters.Add<GlobalExceptionFilter>();
@@ -31,12 +44,13 @@ builder.Services.AddSwaggerGen(options => {
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
-    //options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
-    //    Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
-    //    In = ParameterLocation.Header,
-    //    Name = "Authorization",
-    //    Type = SecuritySchemeType.ApiKey
-    //});
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
 });
 
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("ZapPagination"));
@@ -98,6 +112,8 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();

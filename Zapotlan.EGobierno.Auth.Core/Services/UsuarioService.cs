@@ -211,24 +211,42 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
         public async Task<Usuario?> LoginAsync(string username, string password)
         {   
-            var user = await _unitOfWork.UsuarioRepository.LoginAsync(username, password);
+            var item = await _unitOfWork.UsuarioRepository.LoginAsync(username, password);
 
-            if (user == null)
-            {
+            if (item == null) 
                 throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
-            }
-
-            if (user.Estatus != UsuarioEstatusType.Activo)
-            {
+            if (item.Estatus != UsuarioEstatusType.Activo) 
                 throw new BusinessException("El usuario no se encuentra activo.");
-            }
+            if (item.Empleado != null && item.Empleado.Estatus != EmpleadoEstatusType.Activo)
+                throw new BusinessException("El empleado asociado al usuario no se encuentra activo.");
+            if (item.Persona != null && item.Persona.EstadoVida == PersonaEstadoVidaType.Fallecido)
+                throw new BusinessException("La persona asociada al empleado esta marcada como fallecida.");
 
-            return user;
+            return item;
         }
 
-        public async Task<bool> HasPermisionAsync(Guid id, int derecho)
+        public async Task<bool> HasPermissionAsync(Guid id, int derechoID)
         {
-            return await _unitOfWork.UsuarioRepository.HasPermisionAsync(id, derecho);
+            // HACK - Validaciones faltantes
+            // 1. Que el derecho solicitado tenga acceso total o denegacion total - YA
+            // 2. Que el usuario este dado de baja - YA
+            // 3. Que el empleado asociado no este activo  - YA
+            // 4. Que la persona no haya fallecido - YA
+
+            var derecho = await _unitOfWork.DerechoRepository.GetAsync(derechoID);
+            var usuario = await _unitOfWork.UsuarioRepository.GetAsync(id);
+
+            if (derecho == null) throw new BusinessException("El derecho no existe.");
+            if (usuario == null) throw new BusinessException("El usuario no existe");
+
+            if (usuario.Empleado != null && usuario.Empleado.Estatus != EmpleadoEstatusType.Activo) return false;            
+            if (usuario.Estatus != UsuarioEstatusType.Activo) return false;
+            if (usuario.Persona != null && usuario.Persona.EstadoVida == PersonaEstadoVidaType.Fallecido) return false;
+
+            if (derecho.Acceso == DerechoAccesoType.PermitirTodos) return true;
+            if (derecho.Acceso == DerechoAccesoType.DenegarTodos) return false;
+
+            return await _unitOfWork.UsuarioRepository.HasPermissionAsync(id, derechoID);
         }
 
     }

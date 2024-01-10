@@ -88,9 +88,11 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public int? DerechosInicio { get; set; }
+        public int? DerechosTermino { get; set; }
     }
 
-    public class UsuarioHasPermisionDto
+    public class UsuarioHasPermissionDto
     {
         public Guid UsuarioID { get; set; }
         public int DerechoID { get; set; }

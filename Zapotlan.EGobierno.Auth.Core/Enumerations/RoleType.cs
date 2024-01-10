@@ -9,7 +9,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Enumerations
     public enum RoleType
     {
         Ninguno,
-        Administrator,
-        Readonly
+        Administrador,
+        Editor,
+        Consultor
     }
 }

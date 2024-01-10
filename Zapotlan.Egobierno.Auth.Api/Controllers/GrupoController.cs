@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Zapotlan.EGobierno.Auth.Api.Mappings;
@@ -12,6 +13,7 @@ using Zapotlan.EGobierno.Auth.Core.QueryFilters;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class GrupoController : ControllerBase

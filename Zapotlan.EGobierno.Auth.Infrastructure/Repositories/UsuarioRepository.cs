@@ -124,6 +124,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         {
             var encryptedPwd = GetMD5Hash(password);
             var user = await _entity
+                .Include(u => u.Empleado)
+                .Include(u => u.Persona)
                 .Include(e => e.Derechos)
                 .Include(e => e.Grupos)
                     .ThenInclude(g => g.Derechos)
@@ -133,10 +135,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
             return user;
         }
 
-        public async Task<bool> HasPermisionAsync(Guid id, int derechoID)
+        public async Task<bool> HasPermissionAsync(Guid id, int derechoID)
         {
-            bool hasPermision = false;
-
             var user = await _entity
                 .Include(e => e.Derechos)
                 .Include(e => e.Grupos)
@@ -163,26 +163,6 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                     }
                 }
             }
-            
-            //var hasPermision = await _entity
-            //    .Include(e => e.Derechos)
-            //    .Include(e => e.Grupos)
-            //        .ThenInclude(g => g.Derechos)
-            //    .Where(e => e.ID == id
-            //        && 
-            //        ((
-            //            e.Derechos != null 
-            //            && e.Derechos.Where(d => d.DerechoID == derechoID).Any()
-            //        )
-            //        || 
-            //        (
-            //            e.Grupos != null
-            //            && e.Grupos.Where(g => g.Derechos != null 
-            //                && g.Derechos.Where(d => d.DerechoID == derechoID).Any())
-            //            .Any()
-            //        ))
-            //    ).AnyAsync();
-            //return hasPermision;
 
             return false;
         }

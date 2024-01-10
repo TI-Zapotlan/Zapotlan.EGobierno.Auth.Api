@@ -16,7 +16,7 @@ using Zapotlan.EGobierno.Auth.Infrastructure.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase

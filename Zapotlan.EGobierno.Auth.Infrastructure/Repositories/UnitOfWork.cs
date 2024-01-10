@@ -32,7 +32,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         public IGrupoRepository GrupoRepository => _grupoRepository ?? new GrupoRepository(_context);
         public IUsuarioRepository UsuarioRepository => _usuarioRepository ?? new UsuarioRepository(_context);
 
-        public void Dispose() => _context?.Dispose();        
+        public void Dispose() => _context?.Dispose();
 
         public void SaveChanges()
         {

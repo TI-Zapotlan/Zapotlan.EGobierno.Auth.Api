@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -14,6 +15,7 @@ using Zapotlan.EGobierno.Auth.Core.Services;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class DerechoController : ControllerBase

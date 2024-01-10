@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Zapotlan.EGobierno.Auth.Api.Responses;
@@ -11,6 +12,7 @@ using Zapotlan.EGobierno.Auth.Infrastructure.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class PersonaController : ControllerBase
