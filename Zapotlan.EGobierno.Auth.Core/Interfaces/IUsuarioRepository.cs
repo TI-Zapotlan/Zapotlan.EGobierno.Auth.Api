@@ -6,6 +6,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
     {
         Task<Usuario?> GetSingleAsync(Guid id);
 
+        Task<Usuario?> GetByUsernameAsync(string username);
+
         Task<bool> ExistUsernameAsync(string username, Guid exceptionID = default);
 
         Task DeleteTmpByUpdaterUserIDAsync(Guid id);

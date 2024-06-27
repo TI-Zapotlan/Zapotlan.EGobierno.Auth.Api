@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text;
 using Zapotlan.EGobierno.Auth.Core.CustomEntities;
@@ -26,7 +27,9 @@ builder.Services.AddCors(o => {
         policy => {
             policy.WithOrigins(
                 "http://localhost:3000",
-                "http://localhost:5173"
+                "http://localhost:5173",
+                "http://10.0.0.17",
+                "http://10.0.0.2"
                 )
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -44,6 +47,7 @@ builder.Services.AddSwaggerGen(options => {
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "eGobierno Auth - API", Version = "v2" });
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
@@ -51,6 +55,7 @@ builder.Services.AddSwaggerGen(options => {
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
     });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("ZapPagination"));

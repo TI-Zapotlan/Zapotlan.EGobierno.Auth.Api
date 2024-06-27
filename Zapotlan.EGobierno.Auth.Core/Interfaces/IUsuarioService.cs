@@ -14,6 +14,8 @@ namespace Zapotlan.EGobierno.Auth.Core.Interfaces
 
         Task<Usuario> UpdateAsync(Usuario item);
 
+        Task UpdateTokenDataAsync(Guid id, RefreshToken refreshToken);
+
         Task<bool> DeleteAsync(Guid id);
 
         Task<bool> AddDerechoAsync(Guid id, int derechoID);

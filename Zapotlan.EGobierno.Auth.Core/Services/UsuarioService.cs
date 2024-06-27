@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
+using System.Text;
 using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Enumerations;
@@ -115,57 +117,103 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
         public async Task<Usuario?> GetAsync(Guid id)
         {
             return await _unitOfWork.UsuarioRepository.GetAsync(id);
-        }
+        } // GetAsync
 
+        /// <summary>
+        /// Agrega un nuevo registro a la base de datos, con sus propiedades en blanco como temporal
+        /// para ser editado en el metodo <see cref="UpdateAsync"/> 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task<Usuario> AddAsync(Usuario item)
         {
             // INFO: Validaciones minimas, solo es para crear registros temporales
+            // - Que el usuario sea válido
+            
+            if (!await _unitOfWork.UsuarioRepository.IsUserValid(item.UsuarioActualizacionID))
+                throw new BusinessException("El usuario no tiene los privilegios para crear un nuevo usuario.");
+            
 
-            if (item.UsuarioActualizacionID == Guid.Empty)
-            {
-                throw new BusinessException("Faltó especificar el identificador del usuario que ejecuta la aplicación");
-            }
-            else
-            {
-                if (!await _unitOfWork.UsuarioRepository.IsUserValid(item.UsuarioActualizacionID))
-                {
-                    throw new BusinessException("El usuario no tiene los privilegios para crear un nuevo usuario.");
-                }
-            }
-
-            // Eliminar registros temporales del usuario
+            item.ID = Guid.NewGuid();
+            item.Estatus = UsuarioEstatusType.Ninguno;
+            item.FechaAlta = DateTime.Now;
+            item.FechaActualizacion = DateTime.Now;
+            
             await _unitOfWork.UsuarioRepository.DeleteTmpByUpdaterUserIDAsync(item.UsuarioActualizacionID);
-
-            // Generación del nuevo registro
             await _unitOfWork.UsuarioRepository.AddAsync(item);
             await _unitOfWork.SaveChangesAsync();
 
             return item;
-        }
+        } // AddAsync
 
         public async Task<Usuario> UpdateAsync(Usuario item)
         {
-            // INFO: Aquí van las validaciones
+            if (!await _unitOfWork.UsuarioRepository.IsUserValid(item.UsuarioActualizacionID))
+                throw new BusinessException("El usuario no tiene los privilegios para crear un nuevo usuario.");
 
-            if (item.Estatus == UsuarioEstatusType.Ninguno) { // Es un registo nuevo
-                item.Estatus = UsuarioEstatusType.Activo;
-            }
+            var foundItem = await _unitOfWork.UsuarioRepository.GetAsync(item.ID)
+                ?? throw new BusinessException("No se encuentra el registro del Usuario a actualizar");
 
-            // Validar que el username no exista
-            if (!string.IsNullOrEmpty(item.Username))
+            if (foundItem.Estatus == UsuarioEstatusType.Eliminado)
+                throw new BusinessException("No se encuentra el registro del Usuario a actualizar");
+
+            if (!string.IsNullOrEmpty(item.Username) 
+                && await _unitOfWork.UsuarioRepository.ExistUsernameAsync(item.Username, item.ID))
+                throw new BusinessException("El nombre de usuario ya existe");
+
+            if (foundItem.Estatus == UsuarioEstatusType.Ninguno && string.IsNullOrEmpty(item.Password))
+                throw new BusinessException("Faltó especificar la contraseña del usuario");
+
+            if (!string.IsNullOrEmpty(item.Password))
             {
-                bool existUsername = await _unitOfWork.UsuarioRepository.ExistUsernameAsync(item.Username, item.ID);
-                if (existUsername)
-                {
-                    throw new BusinessException("El nombre de usuario ya existe");
-                }
+                CreatePasswordHash(item.Password ?? string.Empty, out byte[] passwordHash, out byte[] passwordSalt);
+                foundItem.PasswordHash = passwordHash;
+                foundItem.PasswordSalt = passwordSalt;
             }
 
-            await _unitOfWork.UsuarioRepository.UpdateAsync(item);
+            foundItem.PersonaID = item.PersonaID;
+            foundItem.AreaID = item.AreaID;
+            foundItem.EmpleadoID = item.EmpleadoID;
+            foundItem.UsuarioJefeID = item.UsuarioJefeID;
+            foundItem.Username = item.Username;
+            foundItem.Password = string.IsNullOrEmpty(item.Password) 
+                ? foundItem.Password 
+                : GetMD5Hash(item.Password);
+            foundItem.Correo = item.Correo;
+            foundItem.Puesto = item.Puesto;
+            foundItem.Estatus = foundItem.Estatus == UsuarioEstatusType.Ninguno
+                ? UsuarioEstatusType.Activo
+                : item.Estatus;
+            foundItem.Rol = item.Rol;
+            foundItem.FechaActualizacion = DateTime.Now;
+            foundItem.UsuarioActualizacionID = item.UsuarioActualizacionID;
+
+            _unitOfWork.UsuarioRepository.Update(item);
             await _unitOfWork.SaveChangesAsync();
 
             return item;
-        }
+        } // UpdateAsync
+
+        /// <summary>
+        /// Actualiza la información del token para un usuario de acuerdo a los parametros recibidos
+        /// </summary>
+        /// <param name="id">Identificador del usuario</param>
+        /// <param name="refreshToken">Datos del token a actualizar</param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
+        public async Task UpdateTokenDataAsync(Guid id, RefreshToken refreshToken)
+        {
+            var foundItem = await _unitOfWork.UsuarioRepository.GetAsync(id)
+                ?? throw new BusinessException("No se encuentra el registro del Usuario a actualizar el token");
+
+            foundItem.RefreshToken = refreshToken.Token;
+            foundItem.TokenCreated = refreshToken.Created;
+            foundItem.TokenExpires = refreshToken.Expires;
+
+            _unitOfWork.UsuarioRepository.Update(foundItem);
+            await _unitOfWork.SaveChangesAsync();
+        } // UpdateTokenDataAsync
 
         public async Task<bool> DeleteAsync(Guid id)
         {
@@ -209,12 +257,35 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
 
         // USER AUTH
 
+        /// <summary>
+        /// Verifica si se puede iniciar sesión con el username y el password
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        /// <exception cref="BusinessException"></exception>
         public async Task<Usuario?> LoginAsync(string username, string password)
         {   
-            var item = await _unitOfWork.UsuarioRepository.LoginAsync(username, password);
+            var item = await _unitOfWork.UsuarioRepository.GetByUsernameAsync(username)
+                ?? throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
 
-            if (item == null) 
-                throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
+            if (item.PasswordHash != null && item.PasswordSalt != null)
+            {
+                if (!VerifyPasswordHash(password, item.PasswordHash, item.PasswordSalt))
+                    throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
+            }
+            else
+            {
+                item = await _unitOfWork.UsuarioRepository.LoginAsync(username, password)
+                    ?? throw new BusinessException("El nombre de usuario y/o contraseña no son validos.");
+
+                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                item.PasswordHash = passwordHash;
+                item.PasswordSalt = passwordSalt;
+                _unitOfWork.UsuarioRepository.Update(item);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
             if (item.Estatus != UsuarioEstatusType.Activo) 
                 throw new BusinessException("El usuario no se encuentra activo.");
             if (item.Empleado != null && item.Empleado.Estatus != EmpleadoEstatusType.Activo)
@@ -249,5 +320,38 @@ namespace Zapotlan.EGobierno.Auth.Core.Services
             return await _unitOfWork.UsuarioRepository.HasPermissionAsync(id, derechoID);
         }
 
+        // PRIVATE
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using var hmac = new HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        } // CreatePasswordHash
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using var hmac = new HMACSHA512(passwordSalt);
+            var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+            return computeHash.SequenceEqual(passwordHash);
+        } // VerifyPasswordHash
+
+        private string GetMD5Hash(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
+
+            MD5 mD5 = MD5.Create();
+            byte[] data = mD5.ComputeHash(Encoding.Default.GetBytes(value));
+            StringBuilder sBuilder = new();
+            int i;
+
+            for (i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            return sBuilder.ToString();
+        } // GetMD5Hash    
     }
 }

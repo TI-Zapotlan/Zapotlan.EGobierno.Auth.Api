@@ -50,6 +50,15 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Data.Configurations
             builder.Property(e => e.ArchivoCartaResponsabilidad)
                 .HasMaxLength(255);
 
+            builder.Property(e => e.PasswordHash)
+                .HasMaxLength(64);
+
+            builder.Property(e => e.PasswordSalt)
+                .HasMaxLength(128);
+
+            builder.Property(e => e.RefreshToken)
+                .HasMaxLength(128);
+
             builder.Property(e => e.FechaActualizacion)
                 .IsRequired();
 

@@ -66,7 +66,7 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
         public Guid? AreaID { get; set; }
         public Guid? EmpleadoID { get; set; }
         public Guid? UsuarioJefeID { get; set; }
-        public string? Username { get; set; }
+        public string Username { get; set; } = string.Empty;
         public string? Password { get; set; }
         public string? Correo { get; set; }
         public string? Puesto { get; set; }
@@ -88,6 +88,13 @@ namespace Zapotlan.EGobierno.Auth.Core.DTOs
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public int? DerechosInicio { get; set; }
+        public int? DerechosTermino { get; set; }
+    }
+
+    public class UsuarioRefreshTokenDto
+    {
+        public Guid ID { get; set; }
         public int? DerechosInicio { get; set; }
         public int? DerechosTermino { get; set; }
     }

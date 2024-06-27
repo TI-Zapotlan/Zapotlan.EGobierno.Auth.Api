@@ -27,7 +27,7 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
                 .AsEnumerable();
 
             return items;
-        }
+        } // Gets
 
         public override async Task<Usuario?> GetAsync(Guid id)
         {   
@@ -45,7 +45,19 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
         public async Task<Usuario?> GetSingleAsync(Guid id)
         {
             return await _entity.FindAsync(id);
-        }
+        } // GetSingleAsync
+
+        public async Task<Usuario?> GetByUsernameAsync(string username)
+        {
+            return await _entity
+                .Include(u => u.Empleado)
+                .Include(u => u.Persona)
+                .Include(e => e.Derechos)
+                .Include(e => e.Grupos)
+                    .ThenInclude(g => g.Derechos)
+                .Where(e => e.Username != null && e.Username.ToLower() == username.ToLower().Trim())
+                .FirstOrDefaultAsync();
+        } // GetByUsernameAsync
 
         //public override async Task AddAsync(Usuario item)
         //{   
@@ -54,6 +66,8 @@ namespace Zapotlan.EGobierno.Auth.Infrastructure.Repositories
 
         public async Task UpdateAsync(Usuario item)
         {   
+            throw new NotImplementedException();
+            
             var currentItem = await _entity.FindAsync(item.ID);
             if (currentItem != null)
             {

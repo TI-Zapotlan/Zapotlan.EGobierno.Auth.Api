@@ -110,17 +110,12 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> PostUsuario(UsuarioInsertDto itemDto)
         {   
-            var item = new Usuario
-            {
-                ID = Guid.NewGuid(),
-                Estatus = UsuarioEstatusType.Ninguno,
-                FechaAlta = DateTime.Now,
-                FechaActualizacion = DateTime.Now,
+            var item = new Usuario // Mapping
+            {                
                 UsuarioActualizacionID = itemDto.UsuarioActualizacionID
             };
 
             var newItem = await _usuarioServices.AddAsync(item);
-
             var itemReturnDto = _mapper.Map<UsuarioDto>(newItem);
             var response = new ApiResponse<UsuarioDto>(itemReturnDto);
 
@@ -138,8 +133,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             }
 
             var item = _mapper.Map<Usuario>(itemDto);
-            item.ID = id;
-            item.FechaActualizacion = DateTime.Now;
+            // item.FechaActualizacion = DateTime.Now;
 
             var updatedItem = await _usuarioServices.UpdateAsync(item);
             var itemReturnDto = _mapper.Map<UsuarioDto>(updatedItem);

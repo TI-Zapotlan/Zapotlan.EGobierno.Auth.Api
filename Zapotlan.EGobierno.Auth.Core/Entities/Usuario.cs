@@ -31,6 +31,16 @@ namespace Zapotlan.EGobierno.Auth.Core.Entities
 
         public string? ArchivoCartaResponsabilidad { get; set; }
 
+        public byte[]? PasswordHash { get; set; }
+
+        public byte[]? PasswordSalt { get; set; }
+
+        public string? RefreshToken { get; set; }
+
+        public DateTime? TokenCreated { get; set; }
+
+		public DateTime? TokenExpires { get; set; }
+
         // RELATIONS
 
         //[ForeignKey("AreaID")]

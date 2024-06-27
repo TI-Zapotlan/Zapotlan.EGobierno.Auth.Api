@@ -1,14 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing.Tree;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Zapotlan.EGobierno.Auth.Api.Responses;
+using Zapotlan.EGobierno.Auth.Core.CustomEntities;
 using Zapotlan.EGobierno.Auth.Core.DTOs;
 using Zapotlan.EGobierno.Auth.Core.Entities;
 using Zapotlan.EGobierno.Auth.Core.Enumerations;
+using Zapotlan.EGobierno.Auth.Core.Exceptions;
 using Zapotlan.EGobierno.Auth.Core.Interfaces;
 
 namespace Zapotlan.EGobierno.Auth.Api.Controllers
@@ -17,6 +22,9 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private const int TOKEN_EXPIRED_DAYS = 1;
+        private const string REFRESH_TOKEN_NAME = "zap-ti-rt";
+
         private readonly IUsuarioService _usuarioServices;
         private readonly IConfiguration _configuration;
 
@@ -29,6 +37,14 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         }
 
         // ENDPOINTS
+
+        [HttpGet, Authorize]
+        public ActionResult<string> GetMe()
+        {
+            var userName = User?.Identity?.Name;
+
+            return Ok(userName);
+        }
 
         /// <summary>
         /// Obtiene el inicio de sesión de un usuario si coincide su usuario y contraseña
@@ -43,22 +59,46 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<string>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Autentication(UsuarioLoginDto login)
+        public async Task<IActionResult> Authentication(UsuarioLoginDto login)
         {
             // Validar el usuario
-            var usuario = await _usuarioServices.LoginAsync(login.Username, login.Password);
+            var usuario = await _usuarioServices.LoginAsync(login.Username, login.Password)
+                ?? throw new BusinessException("Nombre de usuario y/o contraseña no validos");                        
+            var token = GenerateToken(usuario, login.DerechosInicio, login.DerechosTermino);
+            var refreshToken = GenerateRefreshToken();
 
-            if (usuario != null)
-            {
-                var token = GenerateToken(usuario, login.DerechosInicio, login.DerechosTermino);
-                var response = new ApiResponse<string>(token);
+            await SetRefreshTokenAsync(usuario, refreshToken);
 
-                return Ok(response);
-                //return Ok(new { token });
-            }
+            var response = new ApiResponse<string>(token);
+            return Ok(response);            
+        } // Autentication
 
-            return NotFound();
-        }
+        [HttpPost("refresh-token")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<string>))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> RefreshToken(UsuarioRefreshTokenDto itemDto)
+        {
+            var refreshToken = Request.Cookies[REFRESH_TOKEN_NAME];
+            var item = await _usuarioServices.GetAsync(itemDto.ID)
+                ?? throw new BusinessException("No se encontró el usuario al cual actualizar el token");
+
+            if (string.IsNullOrEmpty(item.RefreshToken))
+                return Unauthorized("El Refresh Token esta vacio");
+                
+            if (!string.IsNullOrEmpty(item.RefreshToken) && !item.RefreshToken.Equals(refreshToken))
+                return Unauthorized("Refresh Token no es valido");
+
+            if (item.TokenExpires < DateTime.Now)
+                return Unauthorized("El token ha expirado");
+
+            var token = GenerateToken(item, itemDto.DerechosInicio, itemDto.DerechosTermino);
+            var newRefreshToken = GenerateRefreshToken();
+            await SetRefreshTokenAsync(item, newRefreshToken);
+            var response = new ApiResponse<string>(token);
+
+            return Ok(response);
+        } // RefreshToken
 
         /// <summary>
         /// Obtiene si el usuario indicado tiene el permiso especificado en
@@ -100,7 +140,6 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             { 
                 foreach (var derecho in item.Derechos) { derechos.Add(derecho.DerechoID); }
             }
-
             if (item.Grupos != null)
             { 
                 foreach (var grupo in item.Grupos) 
@@ -122,7 +161,6 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             if (item.Persona != null)
             {
                 givename = item.Persona.Nombres;
-                // if (!string.IsNullOrEmpty(item.Persona.PrimerApellido))
                 givename += !string.IsNullOrEmpty(item.Persona.PrimerApellido) ? " " + item.Persona.PrimerApellido : "";
                 givename += !string.IsNullOrEmpty(item.Persona.SegundoApellido) ? " " + item.Persona.SegundoApellido : "";
             }
@@ -130,9 +168,11 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             // Generating token claim
             var claims = new[]
             {
+                new Claim(ClaimTypes.Name, item.Username ?? "(null)"),
                 new Claim("idx", item.ID.ToString()),
                 new Claim("username", item.Username ?? "(null)"),
                 new Claim("givename", givename),
+                new Claim("codigo", item.Empleado?.Codigo ?? ""),
                 new Claim(ClaimTypes.Role, RoleType.Administrador.ToString()),
                 new Claim("derechos", string.Join(",", derechos))
             };
@@ -143,19 +183,36 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
                 _configuration["Authentication:Audience"],
                 claims,
                 DateTime.Now,
-                DateTime.UtcNow.AddDays(1)
+                DateTime.Now.AddDays(TOKEN_EXPIRED_DAYS)
             );
-
             var token = new JwtSecurityToken(header, payload);
 
-            //var token = new JwtSecurityToken(
-            //    claims: claims,
-            //    expires: DateTime.Now.AddDays(1),
-            //    signingCredentials: signingCredentials
-            //    );
-
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        } // GenerateToken
 
+        private RefreshToken GenerateRefreshToken()
+        {
+            var item = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.Now.AddDays(TOKEN_EXPIRED_DAYS),
+                Created = DateTime.Now
+            };
+
+            return item;
+        } // GenerateRefreshToken
+
+        private async Task SetRefreshTokenAsync(Usuario usuario, RefreshToken newRefreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = newRefreshToken.Expires
+            };
+
+            Response.Cookies.Append(REFRESH_TOKEN_NAME, newRefreshToken.Token, cookieOptions);
+
+            await _usuarioServices.UpdateTokenDataAsync(usuario.ID, newRefreshToken);
+        }
     }
 }
