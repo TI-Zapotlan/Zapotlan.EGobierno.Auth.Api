@@ -147,7 +147,7 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
                     if (grupo.Derechos != null)
                     {
                         foreach (var derecho in grupo.Derechos)
-                        {
+                        { 
                             if (!derechos.Exists(d => d == derecho.DerechoID)) derechos.Add(derecho.DerechoID);
                         }
                     }
@@ -207,7 +207,8 @@ namespace Zapotlan.EGobierno.Auth.Api.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = newRefreshToken.Expires
+                Expires = newRefreshToken.Expires,
+                SameSite = SameSiteMode.Lax
             };
 
             Response.Cookies.Append(REFRESH_TOKEN_NAME, newRefreshToken.Token, cookieOptions);
